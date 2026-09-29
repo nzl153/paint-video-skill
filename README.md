@@ -1,5 +1,7 @@
 # paint-video
 
+中文 | [English](README.en.md)
+
 让 AI agent 用代码画手绘动画短片和 MV 的 skill。
 
 每一帧都是时间 t 的纯函数：用笔刷一笔一笔画出来，无头 Chrome 并行渲染成图片，ffmpeg 合成 MP4。画面里没有一张 AI 生图，全是代码画的。skill 里写的是做片子的整套方法和踩过的坑，agent 读了就能从一句话需求做到成片。
@@ -93,7 +95,7 @@ node render.mjs --frames --workers=4                                            
 node render.mjs --encode --out=out/demo.mp4                                     # 合成
 ```
 
-16 秒 384 帧，4 个进程几十秒就渲完。
+16 秒 384 帧，4 个进程约 45 秒渲完。
 
 ## 怎么用
 

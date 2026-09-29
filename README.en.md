@@ -1,0 +1,131 @@
+# paint-video
+
+[中文](README.md) | English
+
+A skill that teaches AI agents to paint hand-drawn animated shorts and music videos in code.
+
+Every frame is a pure function of time t. It is painted stroke by stroke, rendered to images in parallel by headless Chrome, and assembled into an MP4 with ffmpeg. There is no AI-generated imagery anywhere in the picture; all of it is drawn by code. The skill holds the whole method for making a film plus the pitfalls we hit along the way, so an agent can go from a one-line request to a finished video.
+
+The skill documents are written in Chinese. Agents read them fine and can reply in any language.
+
+## Films made with it
+
+### *Daitouniao* (The Dumb Bird) · crayon picture-book MV
+
+2:29, 36 shots. Oil-pastel crayon with comic-strip panels: a riverside town in southern China from dawn to night, where the boy panics and turns into a round, dumb-looking bird with a *poof*. From script to subtitled final cut in under 2 hours.
+
+![Daitouniao](docs/daitouniao.webp)
+
+<details>
+<summary>Whole film at a glance</summary>
+
+![Daitouniao contact sheet](docs/daitouniao_sheet.jpg)
+
+</details>
+
+### *Pipa Qu* (Pipa Song) · watercolor MV
+
+2:09, 39 shots. Brush-drawn figures in the style of Feng Zikai, with no facial features; the lantern festival switches to silhouettes against warm light, and the ending pulls back into a hanging scroll.
+
+![Pipa Qu](docs/pipa.webp)
+
+<details>
+<summary>Whole film at a glance</summary>
+
+![Pipa Qu contact sheet](docs/pipa_sheet.jpg)
+
+</details>
+
+### *Luokuan* (The Seal) · ink-wash short
+
+16.8 seconds. A drop of ink blooms into distant mountains; wherever the small red figure walks, reeds and a river get painted in, until it sits down and becomes the seal on the finished painting. Scene code: `examples/brush/ink.js`.
+
+![Luokuan](docs/luokuan.webp)
+
+### *Shixing* (Catching Stars) · watercolor short
+
+14.5 seconds, the first test film. Clawd holds an empty jar, catches falling stars, and a jar of starlight slowly warms the night. Scene code: `examples/brush/stars.js`.
+
+![Shixing](docs/shixing.webp)
+
+The two songs are copyrighted, so this repository contains no audio or lyrics. All previews above are silent.
+
+## What it teaches the agent
+
+- **Two rendering engines**
+  - Watercolor, ink wash, printmaking: p5.js + p5.brush, built on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase), about 1 second per frame.
+  - Crayon picture book: a 2D canvas engine written for this repo, `crayon-kit/`, 10–50 ms per frame.
+- **Rules of filmmaking**: one thing for the viewer to watch per shot, cause before reaction; give the audience time to understand; a transition at every seam; no text in the picture; rich but not cheap, no confetti or sparks as filler.
+- **A checking loop**: after every shot, render a contact sheet, consecutive frames, and zoomed crops, then look at them with an image viewer. Check for teleporting, floating hands, flipped facing, props covering faces, muddy colors. You cannot tell whether an animation works by reading code.
+- **A full music-video workflow**: beat analysis → a shot list written in beat numbers (change the edit in one place) → cheap style tests → a parts library → batches with self-review → targeted reshoots → color grading with ffmpeg.
+- **Lyric subtitles**: a separate transparent PNG layer composited on top, vertical text revealed half a line at a time. In the crayon version the text has the same paper grain and jitters with the picture; a *probe* records where characters are actually drawn in every frame so the layout avoids them.
+- **A counterexample**: a test film that obeyed every rule and still had no story, with a point-by-point account of why.
+
+## Layout
+
+| Path | Contents |
+|---|---|
+| `paint-video/` | The skill itself. `SKILL.md` for shorts, `mv-workflow.md` for long films and MVs, `crayon.md` for the crayon style |
+| `crayon-kit/` | Crayon engine, characters (3-heads-tall figures and the bird), parts library, a 16-second demo, lyric subtitle tools |
+| `examples/brush/` | Scene code for *Shixing* and *Luokuan*; drop into ClaudeAnimationBase to run |
+| `tools/` | `analyze.py` for beats and sections, `make_shotlist.py` shot-list template |
+| `docs/` | Preview images for the README |
+
+## Install
+
+```bash
+git clone https://github.com/nzl153/paint-video-skill
+```
+
+Copy `paint-video/` into your agent's skills directory: `~/.claude/skills/` for Claude Code, `~/.codex/skills/` for Codex. Keep the repository around; the skill looks inside it for `crayon-kit/` and the examples.
+
+Requirements:
+
+- Node 18+, Chrome or Chromium, ffmpeg (on PATH)
+- Subtitle tools: Python 3, numpy, Pillow
+- Beat analysis: also scipy, matplotlib
+- Watercolor style: also clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) and run `npm install`
+
+## Try the crayon demo
+
+```bash
+cd crayon-kit
+npm install
+node render.mjs --sheet=1,4,8,12 --cols=4 --w=480 --out=out/check/sheet.jpg    # contact sheet
+node render.mjs --loop=cast --sheet=1 --cols=1 --w=960 --out=out/check/cast.jpg # character sheet
+node render.mjs --frames --workers=4                                            # render all frames
+node render.mjs --encode --out=out/demo.mp4                                     # encode
+```
+
+16 seconds, 384 frames; about 45 seconds with 4 workers.
+
+## Usage
+
+Once installed, just tell the agent what you want, for example:
+
+- "Make a 15-second crayon picture-book short: a puppy chases a falling leaf until it lands on its nose."
+- "Make an ink-wash short, about 16 seconds, of a crane stepping out of the paper."
+- "Turn this song (audio and LRC lyrics attached) into a landscape music video. Show me the script first."
+
+The agent writes a storyboard for you to review, then builds shot by shot, rendering and checking each one before moving on. For long films it shows you still contact sheets batch by batch and renders motion only after you approve.
+
+## Performance
+
+Measured on an RTX 4060 laptop:
+
+| | Per frame | Example |
+|---|---|---|
+| Crayon engine | 10–70 ms | 2:29 MV, 3590 frames, about 4 minutes with 4 workers |
+| p5.brush watercolor | about 1–2 s | 2:09 MV, 3102 frames, about 1.5–2 hours with 3 workers |
+| Subtitle layer | — | whole film including compositing, about 3–8 minutes with 6 workers |
+
+## Acknowledgements
+
+- [PDoomVideo](https://github.com/JohnHeibel/PDoomVideo): a two-and-a-half-minute MV generated by Claude in Claude Code, the starting point of this approach (that repository has no license; none of its code is used here).
+- [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) (MIT): the p5.brush base; `crayon-kit/render.mjs` is adapted from it.
+- [paint-mv-skills](https://github.com/lintsinghua/paint-mv-skills) (MIT): reference for lyric timing and audio analysis.
+- Recommended fonts: [Ma Shan Zheng](https://fonts.google.com/specimen/Ma+Shan+Zheng), [Long Cang](https://fonts.google.com/specimen/Long+Cang), [Zhi Mang Xing](https://fonts.google.com/specimen/Zhi+Mang+Xing), all OFL, download them yourself.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
