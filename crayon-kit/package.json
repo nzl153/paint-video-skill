@@ -1,0 +1,14 @@
+{
+  "name": "crayon-kit",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Crayon picture-book animation engine: pure 2D canvas, rendered frame by frame in headless Chrome",
+  "scripts": {
+    "sheet": "node render.mjs --sheet=1,4,8,12 --cols=4 --w=480 --out=out/check/sheet.jpg",
+    "video": "node render.mjs --frames --workers=4 && node render.mjs --encode --out=out/video.mp4"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.11.0"
+  }
+}

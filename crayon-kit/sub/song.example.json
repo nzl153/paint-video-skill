@@ -1,0 +1,16 @@
+{
+ "lrc": "../audio/lyrics.lrc",
+ "font": "../fonts/MaShanZheng-Regular.ttf",
+ "bpm": 68,
+ "offset": 0.45,
+ "start": 15,
+ "end": 129.5,
+ "size": 112,
+ "night_from": 68.3,
+ "day": {"ink": "#3b2c26", "halo": "#f6eedb"},
+ "night": {"ink": "#fbe7bf", "halo": "#1f2748"},
+ "split": {"第一句歌词写在这里": 4},
+ "beatwords": {"啦啦啦": 32.21},
+ "repeat": {"from": 80, "shift": 56.47},
+ "reveal_end": {"点题的词": 39.24}
+}

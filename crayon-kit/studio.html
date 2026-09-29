@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>crayon studio</title>
+<style>
+  html, body { margin: 0; background: #1b1820; color: #eee; font: 13px system-ui, sans-serif; }
+  main { padding: 12px; display: grid; gap: 8px; }
+  #out { max-width: min(100%, 1280px); max-height: 86vh; width: auto; height: auto; }
+  .bar { display: flex; gap: 10px; align-items: center; max-width: 1280px; }
+  #scrub { flex: 1; }
+  #tt { font-variant-numeric: tabular-nums; min-width: 160px; }
+</style>
+</head>
+<body>
+<main>
+  <canvas id="out" width="1920" height="1080"></canvas>
+  <div class="bar"><input id="scrub" type="range" min="0" max="11" step="0.0417" value="0"><span id="tt">loading…</span></div>
+</main>
+<script src="src/config.js"></script>
+<script src="src/crayon.js"></script>
+<script src="src/cast.js"></script>
+<script src="src/scenes/lib.js"></script>
+<script src="src/scenes/lib2.js"></script>
+<script src="src/scenes/demo.js"></script>
+</body>
+</html>

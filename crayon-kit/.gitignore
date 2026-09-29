@@ -1,0 +1,11 @@
+node_modules/
+out/
+audio/
+fonts/
+sub/song.json
+sub/boxes.json
+sub/specs.json
+sub/override.json
+sub/ov_full/
+sub/cache/
+__pycache__/
