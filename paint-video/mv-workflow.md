@@ -63,7 +63,7 @@ src/scenes/timeline.js   最后加载，统一注册镜头
 
 ## 6. 渲染运维
 
-- **命令有时长上限时分段跑**：有的 agent 环境会在十分钟左右掐断命令，被掐掉的渲染子进程还可能留在后台。每段用 `--frames --range=a:b --workers=3`，控制在上限以内；中断了再跑同一条，已渲的帧会跳过。
+- **命令有时长上限时分段跑**：有的 agent 环境会在十分钟左右掐断命令，被掐掉的渲染子进程还可能留在后台。每段用 `--frames --range=a:b --workers=3`，控制在上限以内；中断了再跑同一条，已渲的帧会跳过（蜡笔版的 `render.mjs` 会先核对代码签名，代码中途改过就停下，见 `crayon.md`）。
 - **每次续渲之前验帧**：用 PIL 把 `out/frames` 逐张打开，打不开或全黑的**挪到 `out/frames_bad`，不删**。
 - 强制独显：Windows 双显卡笔记本上 d3d11 参数加 `--force_high_performance_gpu`，否则落在集显上越跑越慢。`--gpu-angle=vulkan` 在 Windows 上看起来快 10 倍，其实全黑。
 - 输出要标准 tv range：`-vf scale=out_range=tv,format=yuv420p -color_range tv`，yuvj420p 有的播放器放出来全黑。
@@ -101,7 +101,7 @@ src/scenes/timeline.js   最后加载，统一注册镜头
 1. 代码先留 `.bak`，改这一镜的函数。
 2. 把这一镜时间范围的帧**挪到** `out/frames_s<镜号>_v1` 备份，不删。
 3. 出这一镜的静帧拼图自检。
-4. `--frames --range=<t0>:<t1>` 只渲这一段，再 `--encode` 整片合成。
+4. `--frames --range=<t0>:<t1>` 只渲这一段（蜡笔版要加 `--keep-frames`，否则代码签名对不上会停下），再 `--encode` 整片合成。
 
 一镜 66 帧，重渲加合成共约 4 分钟（p5.brush）。
 

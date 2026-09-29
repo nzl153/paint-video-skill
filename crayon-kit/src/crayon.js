@@ -208,7 +208,8 @@ function renderFrame(t) {
   X.globalCompositeOperation = 'multiply'; X.drawImage(grainC, 0, 0); X.globalCompositeOperation = 'source-over';
 }
 window.renderAt = async (t, type = 'image/png', q = .92) => { renderFrame(t); return outC.toDataURL(type, q); };
-window.renderSheet = async (times, cols = 3, w = 640, crop = null) => {
+window.renderSheet = async (times, cols = 3, w = 640, crop = null, at = null) => {
+  if (at) throw new Error('--crop-at 不支持蜡笔引擎：画面没有全局相机，世界坐标换不成屏幕坐标。改用 --crop=x,y,w,h（屏幕像素）');
   const [, , cw, ch] = crop || [0, 0, W, H], h = Math.round(w * ch / cw), rows = Math.ceil(times.length / cols), sc = document.createElement('canvas');
   sc.width = cols * w; sc.height = rows * h; const c = sc.getContext('2d'), ms = [];
   for (let i = 0; i < times.length; i++) {

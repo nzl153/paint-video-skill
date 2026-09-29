@@ -1,4 +1,6 @@
-// render.mjs: renders studio.html in headless Chrome. Length and fps come from the page (PROJECT in src/config.js).
+// render.mjs: renders studio.html in headless Chrome. Length comes from the page (PROJECT.duration in src/config.js);
+// fps comes from --fps (default 24), so pass the same --fps to --frames and --encode.
+// Any page error (a syntax error in a scene file, an exception while drawing) fails the run with exit code 1.
 //
 //   Look at it (open the images with your image viewer / Read tool):
 //     node render.mjs --sheet=0.5,1,1.5,2 [--cols=4] [--w=480] --out=out/check/a.jpg        contact sheet of chosen times
@@ -6,10 +8,15 @@
 //     node render.mjs --sheet=2.1,2.2 --crop=760,300,400,400 --w=600 --out=out/check/face.jpg full-res crops (details)
 //     node render.mjs --strip=2.0:2.5 --crop-at=960,780,500,400 --out=out/check/feet.jpg       crops that follow a WORLD point
 //         (x,y in world px, may be page expressions like PLK.MX(1.38); w,h in screen px) through each frame's camera
+//         p5.brush base only: the crayon engine has no global camera and rejects --crop-at; use --crop there
 //     node render.mjs --stills=1.2,3.4 --out=out/stills                                     full-res PNGs
 //   Make the video:
 //     node render.mjs --clip [--range=0:4] --out=out/video.mp4                               straight to MP4 (one worker)
 //     node render.mjs --frames [--range=0:8] --workers=4                                     JPEG frames → out/frames (parallel, resumable)
+//         out/frames/.signature records a hash of studio.html + src/ + fps. If the code changed since those frames were
+//         rendered, --frames stops instead of silently reusing them. Then either:
+//           --force        move the old frames to out/frames_old_<time> and render everything again
+//           --keep-frames  keep them (you already moved the frames of the shots you changed aside) and render what's missing
 //     node render.mjs --encode --out=out/video.mp4                                           out/frames → MP4
 //   Standalone loops (LOOPS in the page): add --loop=<name> to any of the above (times are then loop times), or
 //     node render.mjs --loop=emotions --png --out=out/loop_emotions                          one cycle as PNGs (for GIFs)
@@ -17,7 +24,8 @@
 //   --chrome=<path to Chrome/Chromium>.
 import puppeteer from 'puppeteer-core';
 import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync, statSync, renameSync, readdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, statSync, renameSync, readdirSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { homedir } from 'node:os';
@@ -35,7 +43,22 @@ function playwrightChromes() {
 }
 const CHROME = CHROMES.find(p => p && existsSync(p));
 if (!CHROME) { console.error('Chrome not found: pass --chrome=<path> or set CHROME_PATH'); process.exit(1); }
-const fps = +(args.fps || 24), FRAMES_DIR = 'out/frames';
+const fps = +(args.fps || 24), FRAMES_DIR = 'out/frames', SIG_FILE = `${FRAMES_DIR}/.signature`;
+// what the frames depend on: the page, every source file (backups excluded) and fps
+function signature() {
+  const h = createHash('sha1'), walk = d => readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : 1).forEach(e => {
+    const p = `${d}/${e.name}`;
+    if (e.isDirectory()) walk(p); else if (!/\.bak|~$/.test(e.name)) h.update(p).update(readFileSync(p));
+  });
+  h.update(readFileSync('studio.html')); walk('src'); h.update('fps=' + fps);
+  return h.digest('hex');
+}
+const PAGE_ERRORS = [];
+async function failOnPageErrors() {
+  if (!PAGE_ERRORS.length) return;
+  console.error(`\nFAILED: ${PAGE_ERRORS.length} page error(s); nothing rendered here can be trusted. First: ${PAGE_ERRORS[0]}`);
+  await browser.close(); process.exit(1);
+}
 const run = (cmd, a) => new Promise((ok, bad) => { const p = spawn(cmd, a, { stdio: 'inherit' }); p.on('close', c => c ? bad(new Error(cmd + ' exited ' + c)) : ok()); });
 const times = s => String(s).split(',').map(Number);
 const span = s => String(s).split(':').map(Number);
@@ -44,6 +67,8 @@ const fields = s => { const out = []; let d = 0, cur = ''; for (const ch of Stri
 
 if (args.encode) {
   const out = args.out || 'out/video.mp4', n = readdirSync(FRAMES_DIR).filter(f => f.endsWith('.jpg')).length, audio = args.audio;
+  if (existsSync(SIG_FILE) && readFileSync(SIG_FILE, 'utf8').trim() !== signature())
+    console.log('warning: the code (or --fps) changed after these frames were rendered; run --frames again first if that matters');
   console.log(`encoding ${n} frames → ${out}${audio ? ' with ' + audio : ''}`);
   await run('ffmpeg', ['-y', '-loglevel', 'error', '-stats', '-framerate', String(fps), '-i', `${FRAMES_DIR}/f%05d.jpg`,
     ...(audio ? ['-i', audio, '-map', '0:v', '-map', '1:a', '-c:a', 'aac', '-b:a', '192k', '-shortest'] : []),
@@ -70,12 +95,16 @@ const browser = await puppeteer.launch({
 async function openPage(tag = '') {
   const page = await browser.newPage();
   page.on('console', m => { if (['error', 'warn'].includes(m.type())) console.log(`[page${tag}]`, m.text()); });
-  page.on('pageerror', e => console.log(`[page error${tag}]`, e.message));
+  page.on('pageerror', e => { console.log(`[page error${tag}]`, e.message); PAGE_ERRORS.push(e.message); });
   await page.goto(pathToFileURL(resolve('studio.html')).href + '?render', { waitUntil: 'networkidle0' });
   await page.waitForFunction('window.ready === true', { timeout: 60000 });
+  await failOnPageErrors();
   if (args.loop) {
     const ok = await page.evaluate(name => { if (!LOOPS[name]) return false; window.LOOP = LOOPS[name]; return true; }, args.loop);
-    if (!ok) { console.error(`no loop named "${args.loop}"`); process.exit(1); }
+    if (!ok) { console.error(`no loop named "${args.loop}"`); await browser.close(); process.exit(1); }
+  } else if (await page.evaluate(() => typeof SHOTS !== 'undefined' && !SHOTS.length)) {
+    console.error('no shots registered: a scene file failed to load or never called shots([...]); use --loop=<name> for LOOPS');
+    await browser.close(); process.exit(1);
   }
   return page;
 }
@@ -119,6 +148,20 @@ if (args.sheet || args.strip) {
   const probe = await openPage(), len = await lengthOf(probe); await probe.close();
   const [a, b] = args.range ? span(args.range) : [0, len], workers = +(args.workers || 4);
   mkdirSync(FRAMES_DIR, { recursive: true });
+  const sig = signature(), hasFrames = readdirSync(FRAMES_DIR).some(f => f.endsWith('.jpg'));
+  const oldSig = existsSync(SIG_FILE) ? readFileSync(SIG_FILE, 'utf8').trim() : null;
+  if (hasFrames && oldSig !== sig) {
+    if (args.force) {
+      const old = `out/frames_old_${new Date().toISOString().replace(/[-:]/g, '').replace('T', '_').slice(0, 15)}`;
+      renameSync(FRAMES_DIR, old); mkdirSync(FRAMES_DIR, { recursive: true }); console.log(`code changed: old frames moved to ${old}`);
+    } else if (!args['keep-frames']) {
+      console.error(`out/frames was rendered from ${oldSig ? 'different code' : 'code of unknown version'} (studio.html, src/ or fps changed).\n` +
+        'Reusing it would mix old pictures into the video. Rerun with --force to move the old frames aside and render everything,\n' +
+        'or with --keep-frames if you already moved the frames of the changed shots aside yourself.');
+      await browser.close(); process.exit(1);
+    }
+  }
+  writeFileSync(SIG_FILE, sig);
   const first = Math.round(a * fps), last = Math.min(Math.ceil(len * fps) - 1, Math.round(b * fps) - 1);
   const todo = []; for (let i = first; i <= last; i++) { const f = `${FRAMES_DIR}/f${String(i).padStart(5, '0')}.jpg`; if (!existsSync(f) || statSync(f).size < 1000) todo.push(i); }
   console.log(`${todo.length} frames to render (${last - first + 1 - todo.length} already done), ${workers} workers`);
@@ -155,4 +198,5 @@ if (args.sheet || args.strip) {
 } else {
   console.log('nothing to do: see the usage notes at the top of render.mjs');
 }
+await failOnPageErrors();
 await browser.close();
