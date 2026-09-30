@@ -87,16 +87,17 @@ The two songs are copyrighted, so this repository contains no audio or lyrics. A
 - **A checking loop**: after every shot, render a contact sheet, consecutive frames, and zoomed crops, then look at them with an image viewer. Check for teleporting, floating hands, flipped facing, props covering faces, muddy colors. You cannot tell whether an animation works by reading code.
 - **A full music-video workflow**: beat analysis → a shot list written in beat numbers (change the edit in one place) → cheap style tests → a parts library → batches with self-review → targeted reshoots → color grading with ffmpeg.
 - **Lyric subtitles**: a separate transparent PNG layer composited on top, vertical text revealed half a line at a time. In the crayon version the text has the same paper grain and jitters with the picture; a *probe* records where characters are actually drawn in every frame so the layout avoids them.
+- **A directing handbook**: shot sizes, the 180° line and the 30° rule, where to cut, pause-burst-pause rhythm, composition and eye-trace, character acting, action-scene principles, and a storyboard checklist. Written so that models which only follow instructions can use it too.
 - **A counterexample**: a test film that obeyed every rule and still had no story, with a point-by-point account of why.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `paint-video/` | The skill itself. `SKILL.md` for shorts, `mv-workflow.md` for long films and MVs, `crayon.md` for the crayon style, `piying.md` for shadow puppets, `wushan.md` for colored ink-wash fights |
+| `paint-video/` | The skill itself. `SKILL.md` for shorts, `mv-workflow.md` for long films and MVs, `crayon.md` for the crayon style, `piying.md` for shadow puppets, `wushan.md` for colored ink-wash fights, `directing.md` a directing handbook for every style (storyboards, shot sizes, the 180° line, cutting, rhythm, acting) |
 | `crayon-kit/` | Crayon engine, characters (3-heads-tall figures and the bird), parts library, a 16-second demo, lyric subtitle tools |
 | `piying-kit/` | Shadow puppet engine, jointed puppet on rods, the complete code and storyboard of the 60-second *Two Hands*, percussion synthesizer |
-| `inkfight-kit/` | Colored ink-wash engine, brush-outlined cel-shaded figure rig, the complete code of the 19.5-second fight *Shiquan*, `probe.mjs` for joint coordinates |
+| `inkfight-kit/` | Colored ink-wash engine, brush-outlined cel-shaded figure rig, the complete code of the 19.5-second fight *Shiquan*, `probe.mjs` for joint coordinates, a 24-move library `moves.js` (`plan()` chains moves by contact time, with a demo duel) |
 | `examples/brush/` | Scene code for *Shixing* and *Luokuan*; drop into ClaudeAnimationBase to run |
 | `tools/` | `analyze.py` for beats and sections, `make_shotlist.py` shot-list template |
 | `docs/` | Preview images for the README |

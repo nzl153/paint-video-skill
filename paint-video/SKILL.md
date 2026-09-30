@@ -29,7 +29,7 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 
 1. **复制底座**到新项目目录，排除 `out`、`docs`、`.git`。Windows 上用 `robocopy <底座> <新目录> /E /XD out docs .git /XJ`，退出码 1 表示复制成功。
 2. **先通读新目录里的 `ANIMATION_GUIDE.md`**。那是完整的规则和 API：`paint()`、`inkLine()`、相机、转场、`clawd()` 的全部参数，都在那份里，这里不重复。
-3. **先写 `STORYBOARD.md`，给用户过目，再写代码。** 格式按 guide 里的来：一句话梗概、世界与配色、贯穿母题、情绪弧、逐镜头的「读点」时间表。
+3. **先写 `STORYBOARD.md`，给用户过目，再写代码。** 格式按 guide 里的来：一句话梗概、世界与配色、贯穿母题、情绪弧、逐镜头的「读点」时间表。写之前先读同目录的 `directing.md`（导演手册：景别、轴线、剪辑点、节奏、构图、表演），逐镜表按它的格式写，写完按它末尾的检查表过一遍。
 4. 改 `src/config.js` 里的时长和 bpm。场景写成新文件 `src/scenes/<名字>.js`，用 IIFE 包起来，最后调用 `shots([...])`。在 `studio.html` 里用它**替换** `demo.js` 那一行。
 5. 一个镜头一个镜头地做，每做完一个就用下面的检查循环看一遍。
 6. 出片：`node render.mjs --clip --out=out/video.mp4`。时长较长的用 `--frames --workers=4` 并行渲染，再 `--encode` 合成。
