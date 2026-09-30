@@ -1,24 +1,25 @@
 ---
 name: paint-video
-description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md。
+description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎，皮影用自写的皮影引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md，皮影看 piying.md。
 ---
 
 # 手绘动画短片
 
 整条路线：每一帧都是一个 **t（秒）的纯函数**，用笔刷画出来（墨线、平涂、水彩晕染、排线）。无头 Chrome 并行把帧渲染成图片，ffmpeg 再合成 MP4。画面里没有一张图是 AI 生图，全部是代码画的。
 
-两套引擎：
+三套引擎：
 
 | 画风 | 引擎 | 从哪起步 |
 |---|---|---|
 | 水彩、水墨、版画 | p5.js + p5.brush，每帧约 1 秒 | [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)（MIT） |
 | 蜡笔、绘本、连环画 | 纯 2D canvas，每帧 10–50ms | 本仓库的 `crayon-kit/`，见 `crayon.md` |
+| 皮影、剪影、戏台 | 纯 2D canvas，每帧 2–10ms，锣鼓用代码合成 | 本仓库的 `piying-kit/`，见 `piying.md` |
 
 参照作品：[PDoomVideo](https://github.com/JohnHeibel/PDoomVideo)，一支两分半的 MV，由 Claude 在 Claude Code 里生成。那个仓库没有许可证，只能学，不能拿代码去发布；ClaudeAnimationBase 是同一作者后来整理出的 MIT 底座。
 
 ## 环境
 
-- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
+- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
 - Node 18 以上，Chrome 或 Chromium（找不到时给 `render.mjs` 传 `--chrome=<路径>`，或设 `CHROME_PATH`），ffmpeg 在 PATH 里。
 - 字幕工具要 Python 3 和 numpy、Pillow。
 - `npm install` 会下载并执行第三方代码，装之前先问用户。开新项目时把已经装好的模板目录连 `node_modules` 一起复制，就不用每次重装。
@@ -130,6 +131,10 @@ Clawd 捧着空罐子接住掉下来的星星，一罐星光把夜色一点点�
 ## 第二套画风：蜡笔绘本
 
 用户要童趣、绘本、蜡笔、连环画，或者不想再要水彩时，**读同目录的 `crayon.md`**。这套不用 p5.brush，是自写的 2D canvas 蜡笔引擎（`crayon-kit/`），比水彩快一个数量级。里面有：引擎原理和 API、角色参数、变身梗和分格砸格的做法、蜡笔字幕、用探针让字幕避开人物。
+
+## 第三套画风：皮影
+
+用户要皮影、剪影、戏台，或者想做一支不配歌、只用锣鼓的短片时，**读同目录的 `piying.md`**。引擎在 `piying-kit/`：每片皮单独刻好镂空再乘到透光的幕上，角色是带操纵杆的关节小人，锣鼓点用 numpy 合成。里面有：引擎原理和 API、角色参数、动作砸在锣鼓点上的做法、幕后机位的镜像和剪影轮廓光、合成器。
 
 ## 检查循环（每个镜头都要做，别省）
 

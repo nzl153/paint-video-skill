@@ -1,0 +1,15 @@
+{
+  "name": "piying-kit",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Shadow puppet (piying) animation engine: pure 2D canvas, rendered frame by frame in headless Chrome",
+  "scripts": {
+    "sheet": "node render.mjs --sheet=5,10,25,40,50,55 --cols=3 --w=480 --out=out/check/sheet.jpg",
+    "sound": "python sound/synth.py --out=out/sound.wav",
+    "video": "python sound/synth.py --out=out/sound.wav && node render.mjs --frames --workers=4 && node render.mjs --encode --audio=out/sound.wav --out=out/video.mp4"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.11.0"
+  }
+}

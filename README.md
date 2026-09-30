@@ -8,6 +8,19 @@
 
 ## 用它做的片子
 
+### 《两只手》· 皮影短片
+
+60 秒，没有歌。小将军要亮相，胳膊却被另一根杆子拽着满台跑；绕到幕后一看，两根杆子握在同一个人的两只手里。每片皮单独刻好镂空，再叠到透光的幕上；梆子、碎鼓、小锣、「锵」全部用 numpy 合成，按拍号和动作对齐。整部片子的代码、分镜和合成器都在 `piying-kit/`。
+
+![两只手](docs/piying.webp)
+
+<details>
+<summary>全片一览</summary>
+
+![两只手全片](docs/piying_sheet.jpg)
+
+</details>
+
 ### 《呆头鸟》· 蜡笔绘本 MV
 
 2 分 29 秒，36 个镜头。油画棒蜡笔加连环画分格，江南小镇从清晨到夜里，男主一慌就「噗」地变成一只呆头鸟。从剧本到带字幕的成片不到 2 小时。
@@ -46,13 +59,14 @@
 
 ![拾星](docs/shixing.webp)
 
-两部 MV 的歌有版权，仓库里不带音频和歌词，上面的预览都是无声画面。
+两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成。
 
 ## 它教给 agent 什么
 
-- **两套画风引擎**
+- **三套画风引擎**
   - 水彩、水墨、版画：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，每帧约 1 秒。
   - 蜡笔绘本：本仓库自写的 2D canvas 引擎 `crayon-kit/`，每帧 10–50ms。
+  - 皮影：自写的 2D canvas 引擎 `piying-kit/`，每帧 2–10ms，锣鼓用代码合成。
 - **做片子的规矩**：每个镜头只让观众看一件事、先有原因再有反应；给「看懂」留时间；每个接缝都有转场；画面不写字；丰富但不廉价，不撒火花填空。
 - **检查循环**：每做完一个镜头就渲出联系表、连续帧、局部放大图，用读图工具自己看，查瞬移、悬空的手、朝向、道具挡脸、颜色发脏。只读代码看不出动画好不好。
 - **整首歌的 MV 流程**：节拍分析 → 用拍号写逐镜表（改剪辑只改一处）→ 先便宜地试风格 → 零件库 → 分批做、每批自检 → 局部返修 → ffmpeg 调色。
@@ -63,8 +77,9 @@
 
 | 路径 | 内容 |
 |---|---|
-| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风 |
+| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影 |
 | `crayon-kit/` | 蜡笔引擎、角色（3 头身小人和呆头鸟）、零件库、16 秒 demo、歌词字幕工具 |
+| `piying-kit/` | 皮影引擎、带操纵杆的关节小人、60 秒短片《两只手》全部代码和分镜、锣鼓合成器 |
 | `examples/brush/` | 《拾星》《落款》的场景代码，放进 ClaudeAnimationBase 就能跑 |
 | `tools/` | `analyze.py` 节拍与段落分析，`make_shotlist.py` 拍号逐镜表模板 |
 | `docs/` | README 用的预览图 |
@@ -81,6 +96,7 @@ git clone https://github.com/nzl153/paint-video-skill
 
 - Node 18+、Chrome 或 Chromium、ffmpeg（在 PATH 里）
 - 字幕工具：Python 3、numpy、Pillow
+- 皮影锣鼓合成：Python 3、numpy、scipy
 - 节拍分析：再加 scipy、matplotlib
 - 水彩画风：另外 clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) 并 `npm install`
 
@@ -114,13 +130,14 @@ RTX 4060 笔记本上实测：
 | | 每帧 | 例子 |
 |---|---|---|
 | 蜡笔引擎 | 10–70ms | 2:29 的 MV 共 3590 帧，4 进程约 4 分钟 |
+| 皮影引擎 | 2–10ms | 60 秒 1440 帧，单进程直出 MP4 约 2 分钟 |
 | p5.brush 水彩 | 约 1–2 秒 | 2:09 的 MV 共 3102 帧，3 进程约 1.5–2 小时 |
 | 字幕层 | — | 整片 6 进程加合成约 3–8 分钟 |
 
 ## 致谢
 
 - [PDoomVideo](https://github.com/JohnHeibel/PDoomVideo)：Claude 在 Claude Code 里生成的两分半 MV，这套路线的起点（该仓库无许可证，本仓库没有使用它的代码）。
-- [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)（MIT）：p5.brush 底座，`crayon-kit/render.mjs` 由它改来。
+- [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)（MIT）：p5.brush 底座，`crayon-kit/render.mjs` 和 `piying-kit/render.mjs` 由它改来。
 - [paint-mv-skills](https://github.com/lintsinghua/paint-mv-skills)（MIT）：歌词对时和音频分析的参考。
 - 字体推荐 [马善政楷书](https://fonts.google.com/specimen/Ma+Shan+Zheng)、[龙藏体](https://fonts.google.com/specimen/Long+Cang)、[志莽行书](https://fonts.google.com/specimen/Zhi+Mang+Xing)，都是 OFL，需自行下载。
 
