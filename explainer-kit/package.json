@@ -1,0 +1,17 @@
+{
+  "name": "explainer-kit",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Science explainer video engine: canvas scenes, code-synthesized sound effects and edge-tts narration sharing one timeline, rendered frame by frame in headless Chrome",
+  "scripts": {
+    "sheet": "node tools/shot.mjs --times=4,17,27,40,62,88,101,119,138,152,162,180 --cols=4 --w=480 --out=out/check/sheet.jpg",
+    "voice": "node tools/voice.js",
+    "audio": "node tools/audio.js",
+    "video": "node tools/audio.js && node tools/shot.mjs --video --fps=30 --out=out/video.mp4"
+  },
+  "dependencies": {
+    "@fontsource/noto-sans-sc": "^5.2.0",
+    "puppeteer-core": "^25.11.0"
+  }
+}

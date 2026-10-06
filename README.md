@@ -8,6 +8,19 @@
 
 ## 用它做的片子
 
+### 《用光，打开大脑》· 科普讲解片
+
+3 分 05 秒，讲 2026 年诺贝尔生理学或医学奖：池塘里的绿藻怎么「看见」光，这扇光控的门怎样被装进神经元，变成控制大脑的开关，最后让盲人部分恢复视觉。八场八种画风（显微水下、纸面图示、卡哈尔墨线、荧光显微、俯视旷场、铜版画剖面、点阵视角），字幕和标注齐全；声效全部代码合成，旁白用 edge-tts，三者共用一条时间轴。整部片子的代码在 `explainer-kit/`。
+
+![用光，打开大脑](docs/optogenetics.webp)
+
+<details>
+<summary>全片一览</summary>
+
+![用光，打开大脑全片](docs/optogenetics_sheet.jpg)
+
+</details>
+
 ### 《试拳》· 设色水墨打斗
 
 19.5 秒，无声，雾山五行那一路的设色水墨。崖顶对峙，棍拳相撞，矮身钻过勾拳、拖棍擦地上挑，最后跃起抡棍带火砸下，火墨炸满屏。人物是毛笔勾线加平涂和暗面，动作走穿过关键帧的平滑曲线，脚一步一步踩实不打滑；接触点用探针算坐标对准。整部片子的代码在 `inkfight-kit/`。
@@ -72,30 +85,33 @@
 
 ![拾星](docs/shixing.webp)
 
-两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成。
+两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成；《用光，打开大脑》的声效和旁白分别跑 `explainer-kit/tools/audio.js`、`tools/voice.js` 生成。
 
 ## 它教给 agent 什么
 
-- **四套画风引擎**
+- **五套画风引擎**
   - 水彩、水墨、版画：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，每帧约 1 秒。
   - 蜡笔绘本：本仓库自写的 2D canvas 引擎 `crayon-kit/`，每帧 10–50ms。
   - 皮影：自写的 2D canvas 引擎 `piying-kit/`，每帧 2–10ms，锣鼓用代码合成。
   - 设色水墨打斗：自写的 2D canvas 引擎 `inkfight-kit/`，每帧 20–100ms。
+  - 科普讲解片：自写的 2D canvas 引擎 `explainer-kit/`，每帧 60–130ms，声效代码合成，旁白 edge-tts。
 - **导演手册**：景别、轴线和 30 度规则、剪辑点、「停、爆、停」的节奏、构图和视线、角色表演、动作戏原则，最后是一张分镜检查表。写给只会照指令做的模型也能用。
 - **做片子的规矩**：每个镜头只让观众看一件事、先有原因再有反应；给「看懂」留时间；每个接缝都有转场；画面不写字；丰富但不廉价，不撒火花填空。
 - **检查循环**：每做完一个镜头就渲出联系表、连续帧、局部放大图，用读图工具自己看，查瞬移、悬空的手、朝向、道具挡脸、颜色发脏。只读代码看不出动画好不好。
 - **整首歌的 MV 流程**：节拍分析 → 用拍号写逐镜表（改剪辑只改一处）→ 先便宜地试风格 → 零件库 → 分批做、每批自检 → 局部返修 → ffmpeg 调色。
 - **歌词字幕**：单独一层透明 PNG 叠上去，竖排、按半句出。蜡笔版的字也有纸纹、会随画面抖动；用「探针」记下每帧人物实际画在哪里，自动排版避开人物。
+- **科普片的做法**：先查新闻和原文核对事实；字幕、章节、引线标注的规矩；转场跟着内容选；声效按段量响度；旁白逐句生成，读得长就把那一段画面拉长，人声一响背景自动避让。
 - **反面教材**：一支规矩全守却没戏的测试片，逐条写了为什么没戏。
 
 ## 目录
 
 | 路径 | 内容 |
 |---|---|
-| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用） |
+| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用），`explainer.md` 科普讲解片 |
 | `crayon-kit/` | 蜡笔引擎、角色（3 头身小人和呆头鸟）、零件库、16 秒 demo、歌词字幕工具 |
 | `piying-kit/` | 皮影引擎、带操纵杆的关节小人、60 秒短片《两只手》全部代码和分镜、锣鼓合成器 |
 | `inkfight-kit/` | 设色水墨引擎、勾线平涂的人体骨架、19.5 秒打斗短片《试拳》全部代码、算关节坐标的 `probe.mjs`、24 招的招式库 `moves.js`（`plan()` 按接触时刻拼招，附一段示范对打） |
+| `explainer-kit/` | 科普片引擎、3 分钟科普片《用光，打开大脑》全部代码、声效合成器 `tools/audio.js`、旁白脚本 `tools/voice.js` |
 | `examples/brush/` | 《拾星》《落款》的场景代码，放进 ClaudeAnimationBase 就能跑 |
 | `tools/` | `analyze.py` 节拍与段落分析，`make_shotlist.py` 拍号逐镜表模板 |
 | `docs/` | README 用的预览图 |
@@ -113,6 +129,7 @@ git clone https://github.com/nzl153/paint-video-skill
 - Node 18+、Chrome 或 Chromium、ffmpeg（在 PATH 里）
 - 字幕工具：Python 3、numpy、Pillow
 - 皮影锣鼓合成：Python 3、numpy、scipy
+- 科普片旁白：Python 3、`pip install edge-tts`（要能连上微软语音服务，必要时设 `TTS_PROXY`）
 - 节拍分析：再加 scipy、matplotlib
 - 水彩画风：另外 clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) 并 `npm install`
 
@@ -148,6 +165,7 @@ RTX 4060 笔记本上实测：
 | 蜡笔引擎 | 10–70ms | 2:29 的 MV 共 3590 帧，4 进程约 4 分钟 |
 | 皮影引擎 | 2–10ms | 60 秒 1440 帧，单进程直出 MP4 约 2 分钟 |
 | 设色打斗引擎 | 20–100ms | 19.5 秒 468 帧，4 进程不到 1 分钟 |
+| 科普片引擎 | 60–130ms | 3:05 共 5550 帧，单进程直出 MP4 约 9 分钟 |
 | p5.brush 水彩 | 约 1–2 秒 | 2:09 的 MV 共 3102 帧，3 进程约 1.5–2 小时 |
 | 字幕层 | — | 整片 6 进程加合成约 3–8 分钟 |
 

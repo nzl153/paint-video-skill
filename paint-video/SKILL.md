@@ -1,13 +1,13 @@
 ---
 name: paint-video
-description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎，皮影用自写的皮影引擎，打斗用自写的设色水墨引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md，皮影看 piying.md，打斗和雾山五行风看 wushan.md。
+description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎，皮影用自写的皮影引擎，打斗用自写的设色水墨引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md，皮影看 piying.md，打斗和雾山五行风看 wushan.md，科普讲解片（原理科普、HTML 演示 + 代码合成声效 + edge-tts 配音，允许字幕和标注）看 explainer.md。
 ---
 
 # 手绘动画短片
 
 整条路线：每一帧都是一个 **t（秒）的纯函数**，用笔刷画出来（墨线、平涂、水彩晕染、排线）。无头 Chrome 并行把帧渲染成图片，ffmpeg 再合成 MP4。画面里没有一张图是 AI 生图，全部是代码画的。
 
-四套引擎：
+五套引擎：
 
 | 画风 | 引擎 | 从哪起步 |
 |---|---|---|
@@ -15,6 +15,7 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 | 蜡笔、绘本、连环画 | 纯 2D canvas，每帧 10–50ms | 本仓库的 `crayon-kit/`，见 `crayon.md` |
 | 皮影、剪影、戏台 | 纯 2D canvas，每帧 2–10ms，锣鼓用代码合成 | 本仓库的 `piying-kit/`，见 `piying.md` |
 | 设色水墨打斗（雾山五行风） | 纯 2D canvas，每帧 20–100ms | 本仓库的 `inkfight-kit/`，见 `wushan.md` |
+| 科普讲解片（图示、字幕、配音） | 纯 2D canvas，每帧 60–130ms，声效代码合成，旁白 edge-tts | 本仓库的 `explainer-kit/`，见 `explainer.md` |
 
 参照作品：[PDoomVideo](https://github.com/JohnHeibel/PDoomVideo)，一支两分半的 MV，由 Claude 在 Claude Code 里生成。那个仓库没有许可证，只能学，不能拿代码去发布；ClaudeAnimationBase 是同一作者后来整理出的 MIT 底座。
 
@@ -140,6 +141,10 @@ Clawd 捧着空罐子接住掉下来的星星，一罐星光把夜色一点点�
 ## 第四套画风：设色打斗（雾山五行风）
 
 用户要打斗、武侠、动作戏，或者点名雾山五行、设色水墨时，**读同目录的 `wushan.md`**。引擎在 `inkfight-kit/`：人物用毛笔勾线加平涂和暗面，动作走穿过关键帧的平滑曲线，脚单独按踩点走，冲击帧用反相和朱红，最后火墨炸满屏。里面有：引擎和人体的 API、怎么编一场打斗（先定接触点再倒推站位，用 `probe.mjs` 拿数字对）、镜头安排、踩过的坑。
+
+## 第五套：科普讲解片
+
+用户要科普视频、讲清楚某个发现或原理时，**读同目录的 `explainer.md`**。底座是 `explainer-kit/`（《用光，打开大脑》，2026 诺奖光遗传学，3:05）。每场一种画风，允许字幕、章节和图示标注；画面、声效、旁白共用一份 `timeline.js`；旁白读得比画面长时，按句子时长把那一段画面拉长。
 
 ## 检查循环（每个镜头都要做，别省）
 

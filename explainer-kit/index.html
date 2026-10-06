@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用光打开大脑</title>
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-sc/700.css">
+<style>
+  :root { --bg: #14130f; --ink: #e9e1d2; --dim: #9a8f7e; --clay: #bb5f3c; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: 'Noto Sans SC', sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px; }
+  canvas { width: min(100%, calc((100dvh - 90px) * 16 / 9)); aspect-ratio: 16 / 9; height: auto; display: block; background: #000; }
+  .bar { width: min(100%, calc((100dvh - 90px) * 16 / 9)); display: flex; align-items: center; gap: 14px; }
+  button { background: none; border: 1px solid #4a4238; color: var(--ink); font: inherit; font-size: 15px; padding: 5px 16px; cursor: pointer; transition: border-color 140ms; }
+  button:hover { border-color: var(--clay); }
+  input[type=range] { flex: 1; accent-color: var(--clay); }
+  .time { color: var(--dim); font-size: 14px; font-variant-numeric: tabular-nums; min-width: 92px; text-align: right; }
+  body.capture { padding: 0; } body.capture .bar { display: none; } body.capture canvas { width: 1920px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<div class="bar">
+  <button id="play">播放</button>
+  <input id="seek" type="range" min="0" max="166" step="0.01" value="0">
+  <span class="time" id="time">0:00</span>
+</div>
+<audio id="snd" src="out/audio.wav" preload="auto"></audio>
+<script src="src/timeline.js"></script>
+<script src="src/voice.js"></script>
+<script src="src/core.js"></script>
+<script src="src/scenes-a.js"></script>
+<script src="src/scenes-b.js"></script>
+<script>
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  window.renderAt = t => { ctx.save(); renderFrame(ctx, t); ctx.restore(); };
+  window.sheet = (times, cols, w) => {
+    const h = Math.round(w * 9 / 16), rows = Math.ceil(times.length / cols);
+    const s = document.createElement('canvas'); s.width = cols * w; s.height = rows * (h + 22);
+    const g = s.getContext('2d'); g.fillStyle = '#111'; g.fillRect(0, 0, s.width, s.height);
+    times.forEach((t, i) => {
+      window.renderAt(t);
+      const x = (i % cols) * w, y = Math.floor(i / cols) * (h + 22);
+      g.drawImage(cv, x, y, w, h); g.fillStyle = '#ccc'; g.font = '14px monospace'; g.fillText(t.toFixed(2) + 's', x + 6, y + h + 16);
+    });
+    return s.toDataURL('image/jpeg', .9);
+  };
+  // 字体按需加载：把片子里所有用到的字先拉下来，再开始画
+  const allText = CAPS.map(c => c[2]).join('') + VOICE.caps.map(c => c[2]).join('') + CHAPTERS.map(c => c[3]).join('') +
+    '用光，打开大脑2026诺贝尔生理学或医学奖·光遗传学细胞外内膜通道视紫红质蓝带正电的离子管运动记忆恐惧饥饿？开关特制眼镜视网膜感光幸存的神经节从池塘里一颗绿藻到大脑表彰他们发现门控创柏林洪堡维尔茨斯坦福0123456789';
+  window.READY = false;
+  Promise.all([400, 500, 600, 700].map(w => document.fonts.load(`${w} 40px 'Noto Sans SC'`, allText))).then(() => document.fonts.ready).then(() => { window.READY = true; });
+
+  if (new URLSearchParams(location.search).has('capture')) document.body.classList.add('capture');
+  else {
+    document.getElementById('seek').max = END;
+    const seek = document.getElementById('seek'), btn = document.getElementById('play'), time = document.getElementById('time'), snd = document.getElementById('snd');
+    let t = 0, playing = false, last = performance.now();
+    const loop = now => {
+      if (playing) {
+        t += (now - last) / 1000;
+        if (!snd.paused && Math.abs(snd.currentTime - t) > .15) t = snd.currentTime;   // 以音频为准
+        if (t >= END) { t = END; playing = false; snd.pause(); btn.textContent = '重播'; }
+      }
+      last = now; if (window.READY) window.renderAt(t); seek.value = t; time.textContent = `${fmt(t)} / ${fmt(END)}`;
+      requestAnimationFrame(loop);
+    };
+    btn.onclick = () => {
+      if (t >= END) t = 0;
+      playing = !playing; btn.textContent = playing ? '暂停' : '播放';
+      if (playing) { snd.currentTime = t; snd.play().catch(() => {}); } else snd.pause();
+    };
+    seek.oninput = () => { t = +seek.value; snd.currentTime = t; };
+    addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); btn.click(); } });
+    requestAnimationFrame(loop);
+  }
+</script>
+</body>
+</html>

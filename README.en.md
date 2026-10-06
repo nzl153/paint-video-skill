@@ -10,6 +10,19 @@ The skill documents are written in Chinese. Agents read them fine and can reply 
 
 ## Films made with it
 
+### *Light Switch for the Brain* · science explainer
+
+3 minutes 5 seconds on the 2026 Nobel Prize in Physiology or Medicine: how a pond alga "sees" light, how that light-gated door was put into neurons and became a switch for the brain, and how it later gave a blind patient back part of his sight. Eight scenes in eight styles (underwater microscopy, paper diagrams, Cajal-style ink neurons, fluorescence, a top-down open field, an engraved eye cross-section, a dot-matrix point of view), with subtitles and labels. Sound effects are synthesized in code and the Chinese narration comes from edge-tts; picture, sound and voice share one timeline. The whole film's code is in `explainer-kit/`.
+
+![Light Switch for the Brain](docs/optogenetics.webp)
+
+<details>
+<summary>The whole film</summary>
+
+![Light Switch for the Brain, whole film](docs/optogenetics_sheet.jpg)
+
+</details>
+
 ### *Shiquan* (Sparring) · colored ink-wash fight
 
 19.5 seconds, silent, in the colored ink-wash style of *Fog Hill of Five Elements*. A standoff on a cliff, staff meets fist, a duck under a hook into a rising strike that drags the staff along the ground, and a leaping, flaming overhead slam that bursts fire and ink across the screen. Figures are brush-outlined with flat color and a shadow tone; motion runs on smooth curves through the keyframes, and feet are planted step by step so they never slide. Contact points are lined up by computing joint coordinates with a probe. The whole film's code is in `inkfight-kit/`.
@@ -74,30 +87,33 @@ The skill documents are written in Chinese. Agents read them fine and can reply 
 
 ![Shixing](docs/shixing.webp)
 
-The two songs are copyrighted, so this repository contains no audio or lyrics. All previews above are silent; the percussion of *Two Hands* is synthesized, so running `piying-kit/sound/synth.py` regenerates it.
+The two songs are copyrighted, so this repository contains no audio or lyrics. All previews above are silent; the percussion of *Two Hands* is synthesized, so running `piying-kit/sound/synth.py` regenerates it; the sound and narration of *Light Switch for the Brain* come from `explainer-kit/tools/audio.js` and `tools/voice.js`.
 
 ## What it teaches the agent
 
-- **Four rendering engines**
+- **Five rendering engines**
   - Watercolor, ink wash, printmaking: p5.js + p5.brush, built on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase), about 1 second per frame.
   - Crayon picture book: a 2D canvas engine written for this repo, `crayon-kit/`, 10–50 ms per frame.
   - Shadow puppets: a 2D canvas engine written for this repo, `piying-kit/`, 2–10 ms per frame, with synthesized percussion.
   - Colored ink-wash fights: a 2D canvas engine written for this repo, `inkfight-kit/`, 20–100 ms per frame.
+  - Science explainers: a 2D canvas engine written for this repo, `explainer-kit/`, 60–130 ms per frame, with synthesized sound effects and edge-tts narration.
 - **Rules of filmmaking**: one thing for the viewer to watch per shot, cause before reaction; give the audience time to understand; a transition at every seam; no text in the picture; rich but not cheap, no confetti or sparks as filler.
 - **A checking loop**: after every shot, render a contact sheet, consecutive frames, and zoomed crops, then look at them with an image viewer. Check for teleporting, floating hands, flipped facing, props covering faces, muddy colors. You cannot tell whether an animation works by reading code.
 - **A full music-video workflow**: beat analysis → a shot list written in beat numbers (change the edit in one place) → cheap style tests → a parts library → batches with self-review → targeted reshoots → color grading with ffmpeg.
 - **Lyric subtitles**: a separate transparent PNG layer composited on top, vertical text revealed half a line at a time. In the crayon version the text has the same paper grain and jitters with the picture; a *probe* records where characters are actually drawn in every frame so the layout avoids them.
 - **A directing handbook**: shot sizes, the 180° line and the 30° rule, where to cut, pause-burst-pause rhythm, composition and eye-trace, character acting, action-scene principles, and a storyboard checklist. Written so that models which only follow instructions can use it too.
+- **How to make an explainer**: check the news and the original sources before writing; rules for subtitles, chapter tags and leader-line labels; transitions chosen by content; loudness measured section by section; narration generated line by line, stretching the picture wherever a line runs long, with the background ducking under the voice.
 - **A counterexample**: a test film that obeyed every rule and still had no story, with a point-by-point account of why.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `paint-video/` | The skill itself. `SKILL.md` for shorts, `mv-workflow.md` for long films and MVs, `crayon.md` for the crayon style, `piying.md` for shadow puppets, `wushan.md` for colored ink-wash fights, `directing.md` a directing handbook for every style (storyboards, shot sizes, the 180° line, cutting, rhythm, acting) |
+| `paint-video/` | The skill itself. `SKILL.md` for shorts, `mv-workflow.md` for long films and MVs, `crayon.md` for the crayon style, `piying.md` for shadow puppets, `wushan.md` for colored ink-wash fights, `directing.md` a directing handbook for every style (storyboards, shot sizes, the 180° line, cutting, rhythm, acting), `explainer.md` for science explainers |
 | `crayon-kit/` | Crayon engine, characters (3-heads-tall figures and the bird), parts library, a 16-second demo, lyric subtitle tools |
 | `piying-kit/` | Shadow puppet engine, jointed puppet on rods, the complete code and storyboard of the 60-second *Two Hands*, percussion synthesizer |
 | `inkfight-kit/` | Colored ink-wash engine, brush-outlined cel-shaded figure rig, the complete code of the 19.5-second fight *Shiquan*, `probe.mjs` for joint coordinates, a 24-move library `moves.js` (`plan()` chains moves by contact time, with a demo duel) |
+| `explainer-kit/` | Explainer engine, the complete code of the 3-minute *Light Switch for the Brain*, the sound synthesizer `tools/audio.js`, the narration script `tools/voice.js` |
 | `examples/brush/` | Scene code for *Shixing* and *Luokuan*; drop into ClaudeAnimationBase to run |
 | `tools/` | `analyze.py` for beats and sections, `make_shotlist.py` shot-list template |
 | `docs/` | Preview images for the README |
@@ -115,6 +131,7 @@ Requirements:
 - Node 18+, Chrome or Chromium, ffmpeg (on PATH)
 - Subtitle tools: Python 3, numpy, Pillow
 - Shadow puppet percussion: Python 3, numpy, scipy
+- Explainer narration: Python 3 and `pip install edge-tts` (needs access to Microsoft's speech service; set `TTS_PROXY` if you need a proxy)
 - Beat analysis: also scipy, matplotlib
 - Watercolor style: also clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) and run `npm install`
 
@@ -150,6 +167,7 @@ Measured on an RTX 4060 laptop:
 | Crayon engine | 10–70 ms | 2:29 MV, 3590 frames, about 4 minutes with 4 workers |
 | Shadow puppet engine | 2–10 ms | 60 s, 1440 frames, about 2 minutes straight to MP4 with one worker |
 | Colored ink-wash fight engine | 20–100 ms | 19.5 s, 468 frames, under 1 minute with 4 workers |
+| Explainer engine | 60–130 ms | 3:05, 5550 frames, about 9 minutes straight to MP4 with one worker |
 | p5.brush watercolor | about 1–2 s | 2:09 MV, 3102 frames, about 1.5–2 hours with 3 workers |
 | Subtitle layer | — | whole film including compositing, about 3–8 minutes with 6 workers |
 
