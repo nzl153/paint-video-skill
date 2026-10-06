@@ -89,8 +89,8 @@
 
 ## 它教给 agent 什么
 
-- **五套画风引擎**
-  - 水彩、水墨、版画：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，每帧约 1 秒。
+- **五套制作引擎**
+  - 水彩、水墨、版画：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，速度随镜头复杂度波动较大。
   - 蜡笔绘本：本仓库自写的 2D canvas 引擎 `crayon-kit/`，每帧 10–50ms。
   - 皮影：自写的 2D canvas 引擎 `piying-kit/`，每帧 2–10ms，锣鼓用代码合成。
   - 设色水墨打斗：自写的 2D canvas 引擎 `inkfight-kit/`，每帧 20–100ms。
@@ -166,7 +166,7 @@ RTX 4060 笔记本上实测：
 | 皮影引擎 | 2–10ms | 60 秒 1440 帧，单进程直出 MP4 约 2 分钟 |
 | 设色打斗引擎 | 20–100ms | 19.5 秒 468 帧，4 进程不到 1 分钟 |
 | 科普片引擎 | 60–130ms | 3:05 共 5550 帧，单进程直出 MP4 约 9 分钟 |
-| p5.brush 水彩 | 约 1–2 秒 | 2:09 的 MV 共 3102 帧，3 进程约 1.5–2 小时 |
+| p5.brush 水彩 | 约 1 秒起，复杂镜头更慢 | 2:09 的 MV 共 3102 帧，3 进程实测约 1.5–2 小时 |
 | 字幕层 | — | 整片 6 进程加合成约 3–8 分钟 |
 
 ## 致谢

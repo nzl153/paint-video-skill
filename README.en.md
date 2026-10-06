@@ -92,7 +92,7 @@ The two songs are copyrighted, so this repository contains no audio or lyrics. A
 ## What it teaches the agent
 
 - **Five rendering engines**
-  - Watercolor, ink wash, printmaking: p5.js + p5.brush, built on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase), about 1 second per frame.
+  - Watercolor, ink wash, printmaking: p5.js + p5.brush, built on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase); speed varies widely with scene complexity.
   - Crayon picture book: a 2D canvas engine written for this repo, `crayon-kit/`, 10–50 ms per frame.
   - Shadow puppets: a 2D canvas engine written for this repo, `piying-kit/`, 2–10 ms per frame, with synthesized percussion.
   - Colored ink-wash fights: a 2D canvas engine written for this repo, `inkfight-kit/`, 20–100 ms per frame.
@@ -168,7 +168,7 @@ Measured on an RTX 4060 laptop:
 | Shadow puppet engine | 2–10 ms | 60 s, 1440 frames, about 2 minutes straight to MP4 with one worker |
 | Colored ink-wash fight engine | 20–100 ms | 19.5 s, 468 frames, under 1 minute with 4 workers |
 | Explainer engine | 60–130 ms | 3:05, 5550 frames, about 9 minutes straight to MP4 with one worker |
-| p5.brush watercolor | about 1–2 s | 2:09 MV, 3102 frames, about 1.5–2 hours with 3 workers |
+| p5.brush watercolor | about 1 s and up; complex shots are slower | 2:09 MV, 3102 frames, measured at about 1.5–2 hours with 3 workers |
 | Subtitle layer | — | whole film including compositing, about 3–8 minutes with 6 workers |
 
 ## Acknowledgements
