@@ -22,7 +22,8 @@ SOFTWARE.
 
 ---
 
-crayon-kit/render.mjs is adapted from ClaudeAnimationBase
+crayon-kit/render.mjs, piying-kit/render.mjs and inkfight-kit/render.mjs are
+adapted from ClaudeAnimationBase
 (https://github.com/JohnHeibel/ClaudeAnimationBase), MIT License,
 Copyright (c) 2026 John Heibel. examples/brush/*.js are scenes written for
 that base and need it to run.
