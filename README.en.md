@@ -122,13 +122,15 @@ The two songs are copyrighted, so this repository contains no audio or lyrics. A
 
 ```bash
 git clone https://github.com/nzl153/paint-video-skill
+cd paint-video-skill
 ```
 
 Copy `paint-video/` into your agent's skills directory: `~/.claude/skills/` for Claude Code, `~/.codex/skills/` for Codex. Keep the repository around; the skill looks inside it for `crayon-kit/` and the examples.
 
 Requirements:
 
-- Node 18+, Chrome or Chromium, ffmpeg (on PATH)
+- Node 22.12+, Chrome or Chromium, ffmpeg (on PATH)
+- The scripts only look for Chrome in the usual install locations; if yours is elsewhere, pass `--chrome=<path>` or set `CHROME_PATH`
 - Subtitle tools: Python 3, numpy, Pillow
 - Shadow puppet percussion: Python 3, numpy, scipy
 - Explainer narration: Python 3 and `pip install edge-tts` (needs access to Microsoft's speech service; set `TTS_PROXY` if you need a proxy)

@@ -18,9 +18,9 @@ if (!CHROME) { console.error('Chrome not found: pass --chrome=<path> or set CHRO
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--allow-file-access-from-files'] });
 const page = await browser.newPage();
-const errors = [];
+const errors = [];   // 脚本异常：画面不可信，最后以退出码 1 结束
 page.on('pageerror', e => errors.push(String(e)));
-page.on('console', m => m.type() === 'error' && errors.push(m.text()));
+page.on('console', m => m.type() === 'error' && console.log('[page]', m.text()));   // 资源缺失等，例如联系表阶段还没有 out/audio.wav
 await page.setViewport({ width: 1920, height: 1080 });
 await page.goto(pathToFileURL(resolve('index.html')).href + '?capture', { waitUntil: 'load' });
 await page.waitForFunction(() => window.READY, { timeout: 60000 });   // 字体加载完再截，不然前几帧是回退字体
@@ -37,7 +37,9 @@ if (has('video')) {
     if (!ff.stdin.write(Buffer.from(b64, 'base64'))) await new Promise(r => ff.stdin.once('drain', r));
     if (i % 300 === 0) console.log(`${i}/${n}  ${((Date.now() - t0) / (i + 1)).toFixed(0)} ms/frame`);
   }
-  ff.stdin.end(); await new Promise(r => ff.on('close', r));
+  ff.stdin.end();
+  const code = await new Promise(r => ff.on('close', r));
+  if (code) { console.error(`ffmpeg exited ${code}`); await browser.close(); process.exit(1); }
 } else {
   const times = (arg('times') ?? '4,30,90').split(',').map(Number);
   const t0 = Date.now();
@@ -45,6 +47,6 @@ if (has('video')) {
   writeFileSync(out, Buffer.from(url.split(',')[1], 'base64'));
   console.log(`${times.length} frames, ${((Date.now() - t0) / times.length).toFixed(0)} ms/frame`);
 }
-if (errors.length) console.log('PAGE ERRORS:\n' + [...new Set(errors)].join('\n'));
-console.log('->', out);
 await browser.close();
+if (errors.length) { console.error('FAILED: page errors, output cannot be trusted:\n' + [...new Set(errors)].join('\n')); process.exit(1); }
+console.log('->', out);

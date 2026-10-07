@@ -193,7 +193,9 @@ if (args.sheet || args.strip) {
     if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
     if (i % 24 === 0 || i === n - 1) console.log(`frame ${i + 1}/${n}  ${((Date.now() - start) / (i + 1)).toFixed(0)} ms/frame`);
   }
-  ff.stdin.end(); await new Promise(r => ff.on('close', r));
+  ff.stdin.end();
+  const code = await new Promise(r => ff.on('close', r));
+  if (code) { console.error(`ffmpeg exited ${code}`); await browser.close(); process.exit(1); }
   console.log(`wrote ${out}`);
 } else {
   console.log('nothing to do: see the usage notes at the top of render.mjs');

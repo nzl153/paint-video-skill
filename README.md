@@ -120,13 +120,15 @@
 
 ```bash
 git clone https://github.com/nzl153/paint-video-skill
+cd paint-video-skill
 ```
 
 把 `paint-video/` 复制到 agent 的 skills 目录：Claude Code 是 `~/.claude/skills/`，Codex 是 `~/.codex/skills/`。仓库本身留着，skill 会去里面找 `crayon-kit/` 和范例。
 
 需要：
 
-- Node 18+、Chrome 或 Chromium、ffmpeg（在 PATH 里）
+- Node 22.12+、Chrome 或 Chromium、ffmpeg（在 PATH 里）
+- 脚本只在常见安装位置找 Chrome，装在别处时传 `--chrome=<路径>` 或设环境变量 `CHROME_PATH`
 - 字幕工具：Python 3、numpy、Pillow
 - 皮影锣鼓合成：Python 3、numpy、scipy
 - 科普片旁白：Python 3、`pip install edge-tts`（要能连上微软语音服务，必要时设 `TTS_PROXY`）

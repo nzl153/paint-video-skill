@@ -22,7 +22,7 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 ## 环境
 
 - 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`inkfight-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
-- Node 18 以上，Chrome 或 Chromium（找不到时给 `render.mjs` 传 `--chrome=<路径>`，或设 `CHROME_PATH`），ffmpeg 在 PATH 里。
+- Node 22.12 以上，Chrome 或 Chromium（找不到时给 `render.mjs` 传 `--chrome=<路径>`，或设 `CHROME_PATH`），ffmpeg 在 PATH 里。
 - 字幕工具要 Python 3 和 numpy、Pillow。
 - `npm install` 会下载并执行第三方代码，装之前先问用户。开新项目时把已经装好的模板目录连 `node_modules` 一起复制，就不用每次重装。
 
