@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>远光 六段定格</title>
+<style>
+:root{--paper:#f7f2e6;--line:#e4ded0;--ink:#2e2a24;--ink2:#554e44;--ink3:#857b6c}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,"Microsoft YaHei",sans-serif}
+main{max-width:1440px;margin:0 auto;padding:28px 16px 48px}
+h1{font-family:"Noto Serif SC","Source Han Serif SC","Songti SC",SimSun,serif;font-weight:600;font-size:26px;margin:0 0 4px;letter-spacing:.12em}
+.sub{color:var(--ink3);font-size:13px;margin:0 0 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:28px 24px}
+figure{margin:0}
+svg{display:block;width:100%;height:auto;outline:1px solid var(--line)}
+figcaption{display:flex;gap:10px;align-items:baseline;margin-top:8px;font-size:13px;color:var(--ink2)}
+figcaption b{font-family:"Noto Serif SC","Songti SC",SimSun,serif;font-size:16px;color:var(--ink);font-weight:600}
+figcaption i{font-style:italic;font-family:Georgia,serif;color:var(--ink3)}
+</style>
+<main>
+  <h1>远光 · 六段定格</h1>
+  <p class="sub">地平线 y = 300，远光 (560, 208)，两处六帧不动；每段换一种版画工艺。</p>
+  <div class="grid" id="grid"></div>
+</main>
+<script src="plates.js"></script>
+<script>
+(() => {
+const { svg } = YG, frames = [
+  ['一', '盛夏', '孔版套印', 'Risograph', YG.F1],
+  ['二', '仰望', '铜版蚀刻', 'Etching', YG.F2],
+  ['三', '风起', '大理石纹染纸', 'Marbling', YG.F3],
+  ['四', '高处', '蓝晒', 'Cyanotype', YG.F4],
+  ['五', '远光', '凸版网点', 'Letterpress halftone', YG.F5],
+  ['六', '尾声', '植物图版', 'Botanical plate', YG.F6]
+];
+const grid = document.getElementById('grid');
+for (const [no, name, tech, en, fn] of frames) {
+  const f = document.createElement('figure');
+  f.innerHTML = (o => svg(o.defs, o.body + o.glow))(fn()) + `<figcaption><b>${no} · ${name}</b><span>${tech}</span><i>${en}</i></figcaption>`;
+  grid.appendChild(f);
+}
+})();
+</script>

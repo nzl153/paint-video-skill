@@ -1,0 +1,17 @@
+{
+  "name": "prints-kit",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Printmaking short film engine: six SVG print techniques (risograph, etching, marbling, cyanotype, letterpress halftone, botanical plate) and a Tone.js score with real instrument samples, all timed in musical beats and rendered in parallel headless Chrome",
+  "scripts": {
+    "stills": "node tools/stills.mjs",
+    "sheet": "node tools/sheet.mjs 2 14 24 34 40.3 50 56.5 64.3 72 80 85 91 96.2 104 119",
+    "audio": "node tools/audio.mjs",
+    "video": "node tools/render.mjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.11.0"
+  }
+}

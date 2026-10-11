@@ -8,6 +8,23 @@
 
 ## 用它做的片子
 
+### 《远光》· 版画系列短片
+
+93 秒，不出现人。一颗蒲公英种子的六段旅程：盛夏、仰望、风起、高处、远光、尾声。每段换一种版画工艺：孔版套印、铜版蚀刻、大理石纹染纸、蓝晒、凸版网点、植物图版。地平线和远处那盏光六段都不动。
+
+种子和伙伴们在风里各奔东西。它落进当年仰望的那盏光里，才发现那只是一盏灯；更远处，伙伴们各自亮着。
+
+配乐也是代码写的：Tone.js 加真乐器采样（竖琴、小提琴、大提琴、长笛、单簧管等），画面的一切按乐谱的拍子对齐。整部片子的画面、配乐和渲染脚本都在 `prints-kit/`。
+
+![远光](docs/yuanguang.webp)
+
+<details>
+<summary>全片一览</summary>
+
+![远光全片](docs/yuanguang_sheet.jpg)
+
+</details>
+
 ### 《用光，打开大脑》· 科普讲解片
 
 3 分 05 秒，讲 2026 年诺贝尔生理学或医学奖：池塘里的绿藻怎么「看见」光，这扇光控的门怎样被装进神经元，变成控制大脑的开关，最后让盲人部分恢复视觉。八场八种画风（显微水下、纸面图示、卡哈尔墨线、荧光显微、俯视旷场、铜版画剖面、点阵视角），字幕和标注齐全；声效全部代码合成，旁白用 edge-tts，三者共用一条时间轴。整部片子的代码在 `explainer-kit/`。
@@ -85,16 +102,18 @@
 
 ![拾星](docs/shixing.webp)
 
-两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成；《用光，打开大脑》的声效和旁白分别跑 `explainer-kit/tools/audio.js`、`tools/voice.js` 生成。
+两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成；《用光，打开大脑》的声效和旁白分别跑 `explainer-kit/tools/audio.js`、`tools/voice.js` 生成；《远光》的配乐跑 `prints-kit` 里的 `npm run audio` 生成。
 
 ## 它教给 agent 什么
 
-- **五套制作引擎**
+- **六套制作引擎**
   - 水彩、水墨、版画：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，速度随镜头复杂度波动较大。
   - 蜡笔绘本：本仓库自写的 2D canvas 引擎 `crayon-kit/`，每帧 10–50ms。
   - 皮影：自写的 2D canvas 引擎 `piying-kit/`，每帧 2–10ms，锣鼓用代码合成。
   - 设色水墨打斗：自写的 2D canvas 引擎 `inkfight-kit/`，每帧 20–100ms。
   - 科普讲解片：自写的 2D canvas 引擎 `explainer-kit/`，每帧 60–130ms，声效代码合成，旁白 edge-tts。
+  - 版画系列：SVG 生成的六种版画工艺 `prints-kit/`，每帧约 1 秒，多路并行渲染。
+- **自己写配乐**：Tone.js 加真乐器采样，不用合成音色；三层编曲、密度曲线、全曲只留一个高点、人性化；无头 Chrome 离线导出、两遍响度标准化；画面按拍子对齐。
 - **导演手册**：景别、轴线和 30 度规则、剪辑点、「停、爆、停」的节奏、构图和视线、角色表演、动作戏原则，最后是一张分镜检查表。写给只会照指令做的模型也能用。
 - **做片子的规矩**：每个镜头只让观众看一件事、先有原因再有反应；给「看懂」留时间；每个接缝都有转场；画面不写字；丰富但不廉价，不撒火花填空。
 - **检查循环**：每做完一个镜头就渲出联系表、连续帧、局部放大图，用读图工具自己看，查瞬移、悬空的手、朝向、道具挡脸、颜色发脏。只读代码看不出动画好不好。
@@ -107,11 +126,12 @@
 
 | 路径 | 内容 |
 |---|---|
-| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用），`explainer.md` 科普讲解片 |
+| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用），`explainer.md` 科普讲解片，`prints.md` 版画系列，`music.md` 自己写配乐 |
 | `crayon-kit/` | 蜡笔引擎、角色（3 头身小人和呆头鸟）、零件库、16 秒 demo、歌词字幕工具 |
 | `piying-kit/` | 皮影引擎、带操纵杆的关节小人、60 秒短片《两只手》全部代码和分镜、锣鼓合成器 |
 | `inkfight-kit/` | 设色水墨引擎、勾线平涂的人体骨架、19.5 秒打斗短片《试拳》全部代码、算关节坐标的 `probe.mjs`、24 招的招式库 `moves.js`（`plan()` 按接触时刻拼招，附一段示范对打） |
 | `explainer-kit/` | 科普片引擎、3 分钟科普片《用光，打开大脑》全部代码、声效合成器 `tools/audio.js`、旁白脚本 `tools/voice.js` |
+| `prints-kit/` | 六种版画工艺的 SVG 生成、93 秒短片《远光》全部代码、配乐乐谱与离线导出、并行渲染脚本 |
 | `examples/brush/` | 《拾星》《落款》的场景代码，放进 ClaudeAnimationBase 就能跑 |
 | `tools/` | `analyze.py` 节拍与段落分析，`make_shotlist.py` 拍号逐镜表模板 |
 | `docs/` | README 用的预览图 |
