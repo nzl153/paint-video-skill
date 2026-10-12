@@ -1,4 +1,4 @@
-// 《远光》配乐 v10（定稿）。依赖全局 Tone（14.7.77）。
+// 《远光》配乐。弦乐、圆号、低音用 VSCO2 社区版真乐器（CC0），吉他用真尼龙弦采样，远光段第二句升全音到 E 大调。依赖全局 Tone（14.7.77）。
 // buildScore(onLoad) 加载采样并把整首曲子排进 Transport，返回最后的 Limiter 和总拍数。
 // 随机细节用固定种子生成，每次渲染结果一样，画面可以按拍对齐。
 
@@ -18,7 +18,7 @@ async function buildScore(onLoad) {
   const cl = v => Math.max(0.05, Math.min(1, v)), R = a => (rnd() * 2 - 1) * a;
   const D = d => d * 60 / TR.bpm.value;
   const at = (b, f) => TR.schedule(t => f(t), Math.round(b * PPQ) + 'i');
-  const n = (i, note, b, d, v, lag = 0, jit = 0.012) => { const j = Math.abs(R(jit)), vv = cl(v + R(0.06)); at(b, t => I[i].triggerAttackRelease(note, D(d), t + lag + j, vv)); };
+  const n = (i, note, b, d, v, lag = 0, jit = 0.012) => { const j = Math.abs(R(jit)), vv = cl(v + R(0.06)); at(b, t => I[i].triggerAttackRelease(note, D(d), Math.max(0, t + lag + j), vv)); };
   const hit = (i, b, d, v) => { const j = Math.abs(R(0.004)); at(b, t => I[i].triggerAttackRelease(d, t + j, cl(v))); };
   const crackle = (b0, b1, k) => { const ts = []; for (let i = 0; i < k; i++) ts.push(b0 + rnd() * (b1 - b0)); ts.sort((a, b) => a - b).forEach((b, i) => { if (i && b - ts[i - 1] < 0.02) return; hit('crk', b, 0.004, 0.2 + rnd() * 0.5); }); };
   const tempo = (b, bpm, beats) => at(b, t => TR.bpm.rampTo(bpm, beats * 60 / bpm, t));
@@ -32,14 +32,17 @@ async function buildScore(onLoad) {
     G: { k: ["G3", "B3", "D4", "F#4"], a: ["B3", "D4", "F#4", "A4"], b: "G2" }, Gm: { k: ["G3", "A#3", "D4"], a: ["G3", "A#3", "D4", "G4"], b: "G2" },
     A: { k: ["A3", "C#4", "E4"], a: ["A3", "C#4", "E4", "A4"], b: "A2" }, Fm: { k: ["F#3", "A3", "C#4", "E4"], a: ["A3", "C#4", "E4", "F#4"], b: "F#2" },
     Bm: { k: ["F#3", "A3", "B3", "D4"], a: ["B3", "D4", "F#4", "A4"], b: "B1" }, Em: { k: ["E3", "G3", "B3", "D4"], a: ["E4", "G4", "B4", "D5"], b: "E2" },
-    As: { k: ["A3", "D4", "E4"], a: ["A3", "D4", "E4", "A4"], b: "A2" }, Dend: { k: ["D3", "A3", "E4", "F#4", "A4"], a: ["D4", "F#4", "A4", "E5"], b: "D2" }
+    As: { k: ["A3", "D4", "E4"], a: ["A3", "D4", "E4", "A4"], b: "A2" }, Dend: { k: ["D3", "A3", "E4", "F#4", "A4"], a: ["D4", "F#4", "A4", "E5"], b: "D2" },
+    B: { k: ["F#3", "B3", "D#4", "F#4"], a: ["B3", "D#4", "F#4", "B4"], b: "B1" }, Bsus: { k: ["F#3", "B3", "E4", "F#4"], a: ["B3", "E4", "F#4", "B4"], b: "B1" },
+    Gsm: { k: ["G#3", "B3", "D#4", "F#4"], a: ["B3", "D#4", "F#4", "G#4"], b: "G#2" }, Csm: { k: ["G#3", "B3", "C#4", "E4"], a: ["C#4", "E4", "G#4", "B4"], b: "C#2" }
   };
   const PATS = [[0, 1, 2, 1, 3, 1, 2, 1], [0, 2, 1, 3, 2, 1, 0, 2], [0, 1, 2, 3, 2, 3, 1, 2], [0, 2, 3, 2, 1, 2, 3, 1], [0, 1, 3, 1, 2, 1, 3, 2]];
+  const PADQ = [];
   const CELV = [0.5, 0.36, 0.4, 0.56, 0.42, 0.36, 0.4, 0.56];
 
   function bar(bi, c, o) {
-    const s = bi * 4, C = CH[c], v = o.v || 0.6, L = o.len || 4, K = o.ki || 'piano', cut = o.cut || 4, ok = b => b < cut;
-    if (o.pad !== null) { const sv = cl((o.sv || 0.45) + R(0.04)); at(s, t => I[o.pad || 'str'].triggerAttackRelease(C.k, D(Math.min(L, cut + 0.5)), t, sv)); }
+    const s = bi * 4 + (o.off || 0), C = CH[c], v = o.v || 0.6, L = o.len || 4, K = o.ki || 'piano', cut = o.cut || 4, ok = b => b < cut;
+    if (o.pad !== null) { const sv = cl((o.sv || 0.45) + R(0.04)), e = s + Math.min(L, cut + 0.5); o.pad === 'choir' ? at(s, t => I.choir.triggerAttackRelease(C.k, D(e - s), t, sv)) : PADQ.push({ k: o.pad || 'str', s, e, notes: C.k, v: sv }); }
     if (o.keys === 'whole') roll(K, C.k, s, Math.min(L, cut) * 0.95, v - 0.16, 0.035);
     if (o.keys === 'push') { roll(K, C.k, s, 1.4, v - 0.2, 0.02); if (ok(2.5)) roll(K, C.k, s + 2.5, 1.4, v - 0.28, 0.014); }
     if (o.strum) [[0, 1.4, 0], [1.5, 0.9, -0.15], [2.5, 0.6, -0.08], [3, 0.9, -0.12]].forEach(([b, d, dv], k) => roll('guitar', k % 2 ? [...C.a].reverse() : C.a, s + b, d, v + dv, 0.022));
@@ -59,7 +62,7 @@ async function buildScore(onLoad) {
     if (o.bass === 'whole') n('abass', C.b, s, Math.min(L, cut) * 0.95, o.bv || 0.68, 0, 0.005);
     if (o.bass === 'half') { n('abass', C.b, s, 1.9, 0.68, 0, 0.005); if (ok(2)) n('abass', rnd() < 0.4 ? T(C.b, 7) : C.b, s + 2, 1.9, 0.55, 0, 0.005); }
     if (o.bass === 'q') for (let i = 0; i < 4; i++) n('abass', i === 2 ? T(C.b, 7) : C.b, s + i, 0.9, i % 2 ? 0.5 : 0.66, 0, 0.004);
-    if (o.cel8) for (let i = 0; i < 8; i++) n('cello', i % 2 ? T(C.b, 19) : T(C.b, 12), s + i * 0.5, 0.5, CELV[i], 0, 0.006);
+    if (o.cel8) for (let i = 0; i < 8; i++) n('vcsp', i % 2 ? T(C.b, 19) : T(C.b, 12), s + i * 0.5, 0.5, CELV[i], 0, 0.006);
     if (o.dr === 'heart') { const r = C.b; n('timp', r, s, 1.2, 0.62, 0, 0.003); n('timp', r, s + 0.6, 1.2, 0.44, 0, 0.003); n('timp', r, s + 2, 1.2, 0.5, 0, 0.003); n('timp', r, s + 2.6, 1.2, 0.36, 0, 0.003); }
     if (o.dr === 'half') n('timp', C.b, s, 3, 0.55, 0, 0.003);
   }
@@ -70,7 +73,7 @@ async function buildScore(onLoad) {
       const arc = 0.86 + 0.24 * Math.sin(Math.PI * (k + 0.5) / N);
       const vv = v * arc + (k === N - 1 ? -0.06 : 0);
       if (o.grace && d * m >= 1.5 && rnd() < o.grace) n(i, up(x), st + b * m - 0.14, 0.16, vv * 0.7, lag, 0.004);
-      n(i, x, st + b * m, d * m, vv, lag);
+      n(i, x, st + b * m, d * m + (o.leg && k < N - 1 ? o.leg : 0), vv, lag);
     });
   }
   const TA = [[0, "A3", .75], [.75, "D4", .25], [1, "F#4", 1.5], [2.5, "E4", .5], [3, "D4", .5], [3.5, "E4", .5], [4, "B3", 1], [5, "A3", 1], [6, "D4", 2]];
@@ -90,21 +93,33 @@ async function buildScore(onLoad) {
   I.piano = mk(S(nb('piano', ['A2', 'C3', 'Ds3', 'Fs3', 'A3', 'C4', 'Ds4', 'Fs4', 'A4', 'C5', 'Ds5', 'Fs5', 'A5', 'C6']), 1.2), -5, 0.28, -0.1);
   I.flute = mk(S(nb('flute', ['C4', 'E4', 'A4', 'C5', 'E5', 'A5', 'C6', 'E6']), 0.8), -8, 0.3, 0.12);
   I.harp = mk(S(nb('harp', ['A2', 'C3', 'E3', 'G3', 'B3', 'D4', 'F4', 'A4', 'C5', 'E5', 'G5', 'B5', 'D6']), 1.5), -9, 0.35, 0.3);
-  I.cello = mk(S(nb('cello', ['C2', 'E2', 'G2', 'A2', 'C3', 'E3', 'G3', 'A3', 'C4']), 1), -10, 0.3, -0.3);
-  I.violin = mk(S(nb('violin', ['A3', 'C4', 'E4', 'G4', 'A4', 'C5', 'E5', 'G5', 'A5', 'C6', 'E6']), 0.9, 0.02), -8, 0.32, 0.08);
   I.clar = mk(S(nb('clarinet', ['D3', 'F3', 'As3', 'D4', 'F4', 'As4', 'D5', 'F5', 'As5']), 1, 0.02), -8, 0.38, 0.1);
-  I.str = mk(S(gm('string_ensemble_1', ['A2', 'C3', 'Eb3', 'Gb3', 'A3', 'C4', 'Eb4', 'Gb4', 'A4']), 2, 0.3), -16, 0.45, 0);
-  I.trem = mk(S(gm('tremolo_strings', ['A2', 'C3', 'Eb3', 'Gb3', 'A3', 'C4', 'Eb4', 'Gb4', 'A4', 'C5', 'Eb5']), 1.5, 0.2), -15, 0.4, -0.15);
   I.choir = mk(S(gm('choir_aahs', ['A2', 'C3', 'Eb3', 'Gb3', 'A3', 'C4', 'Eb4', 'Gb4', 'A4', 'C5', 'Eb5']), 2.5, 0.6), -15, 0.55, 0);
-  I.horn = mk(S(gm('french_horn', ['A2', 'C3', 'Eb3', 'Gb3', 'A3', 'C4', 'Eb4', 'Gb4']), 1, 0.05), -15, 0.4, -0.2);
-  I.guitar = mk(S(gm('acoustic_guitar_nylon', G9), 1.2), -5, 0.3, 0.2);
-  I.pizz = mk(S(gm('pizzicato_strings', G9), 0.4), -11, 0.3, -0.25);
   I.mbox = mk(S(gm('music_box', ['C5', 'Eb5', 'Gb5', 'A5', 'C6', 'Eb6', 'Gb6', 'A6']), 1.5), -16, 0.5, 0.4);
   I.celesta = mk(S(gm('celesta', ['C5', 'Eb5', 'Gb5', 'A5', 'C6', 'Eb6']), 1.5), -16, 0.5, -0.35);
   I.timp = mk(S(gm('timpani', ['A1', 'D2']), 2), -8, 0.3, 0);
-  I.abass = mk(S(gm('acoustic_bass', ['A1', 'C2', 'Eb2', 'Gb2', 'A2', 'C3']), 0.6), -7, 0.05, 0);
   I.rcym = mk(S(gm('reverse_cymbal', ['C3', 'C4']), 0.5), -18, 0.5, 0);
   I.crk = mk(new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.0005, decay: 0.004, sustain: 0 } }), -34, 0, 0, new Tone.Filter(2500, "highpass"));
+  // VSCO2 社区版（CC0）。除了独奏小提琴，文件名都比实际音高低一个八度，oct 用来校正。
+  const VS = 'https://cdn.jsdelivr.net/gh/sgossner/VSCO-2-CE@master/';
+  const vs = (dir, file, ns, oct = 1) => { const u = {}; ns.forEach(x => u[T(x, 12 * oct)] = file(x).replace('#', '%23')); return { urls: u, baseUrl: VS + dir.replace(/ /g, '%20') + '/' }; };
+  const group = (pan, send) => { const g = new Tone.Gain(1), p = new Tone.Panner(pan), r = new Tone.Gain(send); g.connect(p); p.connect(bus); p.connect(r); r.connect(revIn); return g; };
+  const into = (g, syn, vol) => { syn.volume.value = vol; syn.connect(g); return syn; };
+  const pad = group(-0.05, 0.5), trem = group(-0.15, 0.4);
+  const VN = ['G2', 'A2', 'B2', 'D3', 'F#3', 'A3', 'C4', 'E4', 'G4', 'B4'], VA = ['C2', 'E2', 'G2', 'B2', 'D3', 'F3', 'A3', 'C4', 'E4'], VC = ['E1', 'G1', 'B1', 'D2', 'F2', 'A2', 'C3', 'E3', 'G3'];
+  I.vsolo = mk(S(vs('Strings/Solo Violin/Arco Vib', x => `LLVln_ArcoVib_${x}_f.wav`, ['G3', 'A3', 'C4', 'E4', 'G4', 'A4', 'C5', 'E5', 'G5', 'A5', 'C6'], 0), 0.45, 0.03), 2, 0.34, 0.1);
+  I.vsec = into(pad, S(vs('Strings/Violin Section/susVib', x => `VlnEns_susVib_${x}_v1.wav`, VN), 0.8, 0.12), -6);
+  I.vla = into(pad, S(vs('Strings/Viola Section/susvib', x => `ViolaEns_susvib_${x}_v1_1.wav`, VA), 0.8, 0.12), -5);
+  I.vcs = into(pad, S(vs('Strings/Cello Section/susvib', x => `susvib_${x}_v1_1.wav`, VC), 0.8, 0.12), -5);
+  I.tv = into(trem, S(vs('Strings/Violin Section/Trem', x => `VlnEns_Trem_${x}_v1.wav`, VN), 0.6, 0.08), 0);
+  I.tva = into(trem, S(vs('Strings/Viola Section/trem', x => `Violas_trem_${x}_v1_rr1.wav`, VA), 0.6, 0.08), 0);
+  I.tvc = into(trem, S(vs('Strings/Cello Section/trem', x => `trem_${x}_v1_1.wav`, VC), 0.6, 0.08), 0);
+  I.vc = mk(S(vs('Strings/Cello Section/susvib', x => `susvib_${x}_v3_1.wav`, VC), 0.6, 0.05), -5, 0.3, -0.3);
+  I.vcsp = mk(S(vs('Strings/Cello Section/spic', x => `spic_${x}_v2_RR1.wav`, ['C1', ...VC]), 0.3), -1, 0.3, -0.3);
+  I.pizz = mk(S(vs('Strings/Violin Section/Pizz', x => `VlnEns_Pizz_${x}_v2_rr1.wav`, VN), 0.4), -7.5, 0.3, -0.25);
+  I.abass = mk(S(vs('Strings/Solo Contrabass/Pizz', x => `BKCtbss_Pizz_${x}_v1_rr1.wav`, ['E0', 'F#0', 'G0', 'A#0', 'C1', 'D1', 'E1', 'F#1', 'A1', 'C#2', 'E2']), 0.8), 3, 0.05, 0);
+  I.horn = mk(S(vs('Brass/F Horn/sus', x => `MOHorn_sus_${x}_${['D4', 'F4'].includes(x) ? 'v1' : 'v2'}_1.wav`, ['C1', 'D#1', 'G1', 'A#1', 'D2', 'F2', 'A2', 'C3', 'D4', 'F4']), 1, 0.08), -10, 0.4, -0.2);
+  I.guitar = mk(S(nb('guitar-nylon', ['B1', 'D2', 'E2', 'Fs2', 'Gs2', 'A2', 'B2', 'Cs3', 'D3', 'E3', 'Fs3', 'G3', 'A3', 'B3', 'Cs4', 'Ds4', 'E4', 'Fs4', 'Gs4', 'A4', 'B4', 'Cs5', 'D5', 'E5', 'Fs5', 'G5', 'Gs5', 'A5', 'As5']), 1.2), -21.5, 0.3, 0.2);
   await Tone.loaded();
 
   at(0, t => { bus.gain.cancelScheduledValues(t); bus.gain.setValueAtTime(0.85, t); bus.gain.linearRampToValueAtTime(1, t + 3); });
@@ -126,7 +141,7 @@ async function buildScore(onLoad) {
   [["G", 6], ["A", 7], ["Fm", 8]].forEach(([c, b]) => bar(b, c, { arp: ['harp', '8'], keys: 'push', bass: 'half', pizz: b > 6, pv: -0.08, v: 0.62, sv: 0.45 + (b - 6) * 0.06 }));
   bar(9, "Bm", { arp: ['harp', '8'], keys: 'push', bass: 'half', pizz: true, pv: -0.08, v: 0.62, sv: 0.6, cut: 3 });
   mel('flute', [[0, "D4", .75], [.75, "F#4", .25], [1, "A4", 1.5], [2.5, "B4", .5], [3, "A4", 1], [4, "E4", .75], [4.75, "F#4", .25], [5, "A4", 2], [8, "F#4", .75], [8.75, "A4", .25], [9, "D5", 1.5], [10.5, "C#5", .5], [11, "B4", 1], [12, "A4", 1], [13, "F#4", 1], [14, "B4", 2]], 24, { v: 0.74, grace: 0.25, lag: 0.025 });
-  mel('violin', [[0, "D4", 4], [4, "C#4", 4], [8, "C#4", 2], [10, "E4", 2], [12, "D4", 3]], 24, { v: 0.48, lag: 0.03 });
+  mel('vsolo', [[0, "D4", 4], [4, "C#4", 4], [8, "C#4", 2], [10, "E4", 2], [12, "D4", 3]], 24, { leg: 0.12, v: 0.48, lag: 0.03 });
   n('horn', "C#4", 32, 4, 0.4); n('horn', "D4", 36, 3, 0.46);
   n('rcym', "C4", 37.6, 2.4, 0.55);
 
@@ -134,25 +149,37 @@ async function buildScore(onLoad) {
   [["G", 10], ["A", 11], ["Fm", 12], ["Bm", 13], ["Em", 14]].forEach(([c, b]) => bar(b, c, { pad: 'trem', sv: 0.52, bass: 'q', cel8: true, dr: 'heart', v: 0.66 }));
   [40, 48, 56].forEach(b => gust(b - 0.65, 0.36));
   bar(15, "As", { pad: 'trem', sv: 0.46, bass: 'whole', bv: 0.55, dr: 'half', keys: 'whole', v: 0.58 });
-  mel('flute', TA, 40, { oct: 1, v: 0.74, grace: 0.2 }); mel('violin', TA, 40, { oct: 1, v: 0.62 });
-  mel('flute', TB, 48, { oct: 1, v: 0.78, grace: 0.2 }); mel('violin', TB, 48, { oct: 1, v: 0.66 });
+  mel('flute', TA, 40, { oct: 1, v: 0.74, grace: 0.2 }); mel('vsolo', TA, 40, { leg: 0.12, oct: 1, v: 0.62 });
+  mel('flute', TB, 48, { oct: 1, v: 0.78, grace: 0.2 }); mel('vsolo', TB, 48, { leg: 0.12, oct: 1, v: 0.66 });
   [[0, "D3", 4], [4, "E3", 4], [8, "C#3", 4], [12, "D3", 4]].forEach(([b, x, d]) => n('horn', x, 40 + b, d, 0.36));
-  mel('flute', [[0, "D6", 1.5], [1.5, "B5", .5], [2, "A5", 1], [3, "F#5", 1]], 56, { v: 0.82 }); mel('violin', [[0, "D5", 1.5], [1.5, "B4", .5], [2, "A4", 1], [3, "F#4", 1]], 56, { v: 0.66 });
+  mel('flute', [[0, "D6", 1.5], [1.5, "B5", .5], [2, "A5", 1], [3, "F#5", 1]], 56, { v: 0.82 }); mel('vsolo', [[0, "D5", 1.5], [1.5, "B4", .5], [2, "A4", 1], [3, "F#4", 1]], 56, { leg: 0.12, v: 0.66 });
   ["E5", "D5", "B4", "A4"].forEach((x, i) => n('flute', x, 60.5 + i * 0.8, 0.9, 0.5 - i * 0.05));
 
   // 四、高处
   bar(16, "G", { arp: ['harp', '4'], sparse: true, pad: 'choir', v: 0.45, sv: 0.45 }); bar(17, "D", { arp: ['harp', '4'], sparse: true, pad: 'choir', bass: 'whole', bv: 0.45, v: 0.45, sv: 0.46 }); bar(18, "Em", { arp: ['harp', '4'], sparse: true, pad: 'choir', bass: 'whole', bv: 0.5, v: 0.46, sv: 0.48 });
-  bar(19, "As", { arp: ['harp', '8'], pad: 'choir', bass: 'whole', bv: 0.55, v: 0.52, sv: 0.52 }); at(76, t => I.str.triggerAttackRelease(CH.As.k, D(4), t, 0.5));
+  bar(19, "As", { arp: ['harp', '8'], pad: 'choir', bass: 'whole', bv: 0.55, v: 0.52, sv: 0.52 }); PADQ.push({ k: 'str', s: 76, e: 80, notes: CH.As.k, v: 0.5 });
   mel('clar', [[0, "A4", 1.5], [1.5, "D5", .5], [2, "F#5", 4], [6, "E5", 1], [7, "D5", 1], [8, "E5", 2], [10, "B4", 2], [12, "A4", 3]], 64, { v: 0.6, grace: 0.15, lag: 0.04 });
   ["A5", "F#6", "D6", "B5", "E6", "A5", "D6", "F#6"].forEach((x, i) => n('celesta', x, 64.5 + i * 1.5, 1.4, 0.3 + (i % 3 === 0 ? 0.04 : 0)));
   n('rcym', "C4", 77.6, 2.4, 0.45); n('piano', "F#3", 79, 0.5, 0.5); n('piano', "G3", 79.5, 0.5, 0.55);
 
   // 五、远光
-  [["G", 20], ["A", 21], ["Fm", 22]].forEach(([c, b]) => bar(b, c, { arp: ['harp', '8'], av: 0.52, keys: 'push', bass: 'half', pizz: b > 20, pv: -0.1, v: 0.58, sv: 0.48 }));
-  bar(23, "Bm", { arp: ['harp', '8'], av: 0.5, keys: 'push', bass: 'half', pizz: true, pv: -0.1, v: 0.56, sv: 0.45, cut: 2 });
-  mel('violin', TAv, 80, { v: 0.8, grace: 0.25, lag: 0.03 }); mel('violin', TBv, 88, { v: 0.84, grace: 0.25, lag: 0.03 });
-  mel('cello', [[0, "D3", 2], [2, "B2", 2], [4, "C#3", 2], [6, "E3", 1.5], [7.5, "D3", .5], [8, "A2", 2], [10, "C#3", 2], [12, "D3", 2]], 80, { v: 0.55, lag: 0.03 });
-  n('harp', "A5", 87, 2, 0.4);
+  // 灯亮那一刻（86–88）经 B 和挂四转进 E 大调，第二句整体升全音；末两拍落在 A，A 同时是 D 的属和弦，顺回尾声
+  const F = { arp: ['harp', '8'], pad: null, keys: 'push', bass: 'half', pv: -0.1 };
+  bar(20, "G", { ...F, av: 0.52, v: 0.58 });
+  bar(21, "A", { ...F, av: 0.52, v: 0.58, pizz: true, cut: 2 });
+  bar(21, "B", { ...F, off: 2, av: 0.56, v: 0.6, cut: 1 }); bar(21, "Bsus", { ...F, off: 3, keys: null, bass: null, av: 0.56, v: 0.6, cut: 1 });
+  bar(22, "Gsm", { ...F, av: 0.56, v: 0.62, pizz: true });
+  bar(23, "Csm", { ...F, av: 0.52, v: 0.58, pizz: true, cut: 2 }); bar(23, "A", { off: 2, pad: null, keys: 'whole', bass: 'whole', bv: 0.5, v: 0.52, cut: 2 });
+  mel('vsolo', TAv, 80, { v: 0.78, grace: 0.12, lag: 0.02, leg: 0.15 });
+  mel('vsolo', TBv.map(([b, x, d]) => [b, T(x, 2), d]), 88, { v: 0.84, grace: 0.12, lag: 0.02, leg: 0.15 });
+  mel('vc', [[0, "D3", 2], [2, "B2", 2], [4, "C#3", 2], [6, "D#3", 1], [7, "E3", 1], [8, "B2", 2], [10, "D#3", 2], [12, "E3", 2], [14, "C#3", 2.5]], 80, { v: 0.6, lag: -0.04, leg: 0.2 });
+  // 弦乐组铺底：三个声部各自级进，B→挂四的 E 在 88 解决到 D#；整体随乐句渐强，灯亮后推到最满，进尾声前收掉
+  [[[0, "G4", 4], [4, "A4", 2], [6, "F#4", 2], [8, "G#4", 6], [14, "A4", 2.6]],
+   [[0, "D4", 4], [4, "E4", 2], [6, "D#4", 1], [7, "E4", 1], [8, "D#4", 4], [12, "E4", 4.6]],
+   [[0, "B3", 4], [4, "C#4", 2], [6, "B3", 6], [12, "C#4", 4.6]]].forEach((line, k) =>
+    line.forEach(([b, x, d], j) => n(k < 2 ? 'vsec' : 'vla', x, 80 + b, d + (j < line.length - 1 ? 0.3 : 0), 0.62 - k * 0.04, -0.12, 0.004)));
+  [[80, 1, 1.5], [84, 1.13, 2], [86, 1.34, 2], [88, 1.55, 3], [92, 1.34, 2], [94, 1.06, 1.5], [95.5, 0.85, 1]].forEach(([b, g, d]) => at(b, t => pad.gain.rampTo(g, D(d), t)));
+  n('harp', "B5", 87, 2, 0.4);
 
   // 尾声
   crackle(96, 124, 40);
@@ -160,9 +187,24 @@ async function buildScore(onLoad) {
   n('abass', "G2", 96, 3.8, 0.52);
   bar(27, "Dend", { keys: 'whole', bass: 'whole', bv: 0.5, v: 0.5, len: 12, sv: 0.4 }); at(108, t => I.choir.triggerAttackRelease(CH.Dend.k, D(12), t, 0.3));
   mel('piano', [[0, "A4", 1.5], [1.5, "D5", .5], [2, "F#5", 2], [4, "G5", 2], [6, "D5", 2], [8, "E5", 1.5], [9.5, "F#5", .5], [10, "E5", 2], [12, "A4", 4], [16, "F#4", 2], [18, "E4", 2], [20, "D4", 4]], 96, { v: 0.62, grace: 0.15, lag: 0.03 });
-  mel('violin', [[0, "D4", 4], [4, "A#3", 4], [8, "C#4", 4], [12, "D4", 4], [16, "A3", 8]], 96, { v: 0.48, lag: 0.04 });
+  mel('vsolo', [[0, "D4", 4], [4, "A#3", 4], [8, "C#4", 4], [12, "D4", 4], [16, "A3", 8]], 96, { leg: 0.12, v: 0.48, lag: 0.04 });
   [[6.5, "F#5"], [14.5, "A5"]].forEach(([b, x]) => n('harp', x, 96 + b, 2, 0.36));
   n('mbox', "E6", 118.5, 3, 0.3);
 
+  // 铺底：相邻小节的共同音连着拉，不重新起弓，只有换音的声部在动；按音区分给小提琴组、中提琴组、大提琴组
+  const SEC = { str: ['vcs', 'vla', 'vsec'], trem: ['tvc', 'tva', 'tv'] };
+  const emit = o => { const m = Tone.Frequency(o.x).toMidi(), [lo, mid, hi] = SEC[o.k]; n(m < 48 ? lo : m < 55 ? mid : hi, o.x, o.s, o.e - o.s, o.v, -0.12, 0.004); };
+  for (const k in SEC) {
+    let live = new Map();
+    PADQ.filter(p => p.k === k).sort((a, b) => a.s - b.s).forEach(p => {
+      const next = new Map();
+      p.notes.forEach(x => { const o = live.get(x); if (o && Math.abs(o.e - p.s) < 0.75) { o.e = p.e; next.set(x, o); } else next.set(x, { k, x, s: p.s, e: p.e, v: p.v }); });
+      live.forEach((o, x) => next.get(x) !== o && emit(o)); live = next;
+    });
+    live.forEach(emit);
+  }
+  // 弦乐的力度起伏：仰望一路渐强到风起，风起的震音推到 56 拍最高点再落，尾声慢慢收
+  [[0, 0.8, 0], [24, 0.85, 4], [36, 1.1, 4], [40, 0.9, 1], [96.5, 0.85, 2], [110, 0.7, 8]].forEach(([b, g, d]) => at(b, t => pad.gain.rampTo(g, D(d) || 0.01, t)));
+  [[40, 0.75, 0.01], [55, 1.2, 15], [58, 0.9, 3], [63, 0.6, 2]].forEach(([b, g, d]) => at(b, t => trem.gain.rampTo(g, D(d), t)));
   return { out: lim, endBeats: END + TAIL_BEATS, ppq: PPQ, sections: SECTIONS };
 }

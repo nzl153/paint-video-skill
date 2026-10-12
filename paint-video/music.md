@@ -2,10 +2,10 @@
 
 短片没有现成的歌、要自己写一段配乐时，读这份。
 
-范例是《远光》的配乐：约 93 秒，六段，改了十版才定稿。代码在本仓库的 `prints-kit/music/`：
+范例是《远光》的配乐：约 93 秒，六段，改了十版才定稿，后来又把弦乐、圆号、低音换成了 VSCO2 真乐器（见「换真弦乐」一节）。代码在本仓库的 `prints-kit/music/`：
 - `score.js`：乐谱；
 - `render-audio.html`：离线渲染页；
-- 导出脚本是 `prints-kit/tools/audio.mjs`。
+- 导出脚本是 `prints-kit/tools/audio.mjs`，采样缓存在 `prints-kit/tools/cache.mjs`。
 
 ## 顺序
 
@@ -41,6 +41,36 @@
 - 琶音的音型每小节换一点，别八小节一模一样。
 - 速度表里写几处 `rampTo`，让速度在段落之间呼吸。
 
+## 换真弦乐：从「好听」到「像真乐团」
+
+这首曲子第一版定稿时，骨架已经是对的：主题贯穿、和声情绪、配器跟着剧情走。但内行一听就能听出破绽，问题出在「皮」上：GM 音色廉价，小提琴是一个音一个音单独录的，没有连弓。升级只换皮，不动骨架。
+
+**先拿一段做新旧对比。** 只渲一段（约 18 秒），新旧两版都响度对齐到 -16 LUFS，听过确认新版更好，再推到全曲。
+
+**音源换成 VSCO2 社区版**（GitHub sgossner/VSCO-2-CE，CC0）：
+- jsDelivr 可以直接拉：`https://cdn.jsdelivr.net/gh/sgossner/VSCO-2-CE@master/<路径>`。路径里的空格写成 `%20`，`#` 写成 `%23`。
+- 全库有 3000 多个文件，先用 `gh api repos/sgossner/VSCO-2-CE/git/trees/master?recursive=1` 拉一份文件清单再挑。
+- 《远光》用了：独奏小提琴 `Arco Vib` 强奏层；小提琴组、中提琴组、大提琴组的 `susVib` 长音、`Trem` 震音、`Pizz` 拨弦；大提琴组 `spic` 跳弓；低音提琴 `Pizz`；圆号 `sus`。
+- 吉他用 nbrosowsky 的 `guitar-nylon`。合唱、八音盒、钢片琴 VSCO 里没有，还用 GM。
+
+**VSCO 的坑：**
+- **八度标法不统一。** 除了独奏小提琴，其他乐器的文件名都比实际音高低一个八度：文件名 A3，实际响的是 A4。每换一种乐器，先下载一个采样，用 YIN 测一下音高，再在映射里校正。
+- **独奏小提琴的弱奏层不能拉旋律。** 它是一个两秒长的慢渐强，短音出不来。旋律用强奏层（`_f`），音量交给力度控制。
+- **弦乐组弱奏层的起音慢 0.1 秒左右。** 拿来铺底时提前 0.12 秒触发；最开头那一拍要把触发时间夹到不小于 0，否则 `setValueAtTime` 会报负数时间。
+
+**编曲上的三处改动：**
+- **假连弓**：旋律相邻两个音重叠 0.12–0.15 拍（`mel(..., { leg })`），配 0.45 秒的 release。
+- **铺底按声部写**：每个和弦的音按音区分给大提琴组、中提琴组、小提琴组；相邻小节的共同音连着拉，不重新起弓，只有要换音的声部在动（`PADQ`）。每个声部组单独走一条 Gain 总线，用 `rampTo` 写渐强渐弱。
+- **高潮段升全音**：远光段灯亮那一刻，经过 B 和挂四和弦转进 E 大调，第二句整体升一个全音；末两拍落在 A 和弦，A 同时是 D 大调的属和弦，顺回尾声。
+
+**换音源以后一定要对齐响度。** 把每件新乐器和旧乐器都单独渲出来，按段落比 RMS。《远光》这次吉他大了 16 dB，铺底大了 5 dB，低音小了 4–6 dB，全靠耳朵猜是猜不准的。最后整曲按段对比，每段和旧版的差都在 1 dB 以内，起伏的形状就保住了。
+
+**采样一多就要本地缓存。** 全曲要拉 200 多 MB，jsDelivr 偶尔有一两个文件超时，Tone 的 `Failed to fetch` 会让整次渲染报废。`tools/cache.mjs` 用 puppeteer 的请求拦截：缓存里有的从磁盘回；没有的放行，让浏览器自己下，再从响应里存一份。`audio.mjs` 失败会整次重试，第二次基本全走缓存。
+- 下载别交给 Node 的 `fetch`：它不认 `HTTPS_PROXY`，开着代理的机器上会连不上。浏览器走系统代理。
+- `Tone.Reverb` 的脉冲响应是随机噪声生成的，所以每次渲出来的 wav 都有细微差别（相关系数约 0.99）。重渲了 wav，就要把片子的音轨也重新封装一次。
+
+**配乐改了，画面不用重渲。** 只要速度表不变，用 `-map 0:v -c:v copy` 把旧片的画面流原样拷过来，配上新的 wav，再用 `apad` 加 `-shortest` 对齐长度。
+
 ## 采样源（都核实过可用）
 
 - `https://cdn.jsdelivr.net/gh/nbrosowsky/tonejs-instruments@master/samples/<乐器>/<音名>.mp3`
@@ -49,6 +79,8 @@
 - `https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@gh-pages/FluidR3_GM/<名字>-mp3/<音名>.mp3`
   - 一整套 GM 音色，里面有 reverse_cymbal。
   - 降号写作 `b`，比如 `Bb3`。
+- `https://cdn.jsdelivr.net/gh/sgossner/VSCO-2-CE@master/...`
+  - VSCO2 社区版的真管弦乐，CC0，带多种演奏法。注意八度标法，见上一节。
 - 每件乐器只取几个音，比如每隔大三度一个，`Tone.Sampler` 会自己移调补齐。
 
 ## 写法（Tone.js 14.7.77）
@@ -66,7 +98,7 @@
    1. 只剪尾部静音：`areverse,silenceremove=start_periods=1:start_threshold=-60dB,areverse`。不要加 `afade=t=out:st=0`，那会把整首淡没。
    2. 响度标准化**跑两遍**：第一遍用 `loudnorm=I=-16:TP=-1.5:LRA=20:print_format=json` 量出数值，第二遍带上量出来的值，再加 `linear=true`。只跑一遍，强弱会被压平。
    3. 转 320k mp3。
-3. 渲完量一下峰值和响度再交。《远光》的结果是 -15.9 LUFS，峰值 -3.2 dBFS，LRA 7.1。
+3. 渲完量一下峰值和响度再交。《远光》的结果是 -16.0 LUFS，峰值约 -2 dBFS。
 
 ## 对画面
 

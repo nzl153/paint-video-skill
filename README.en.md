@@ -16,7 +16,7 @@ The skill documents are written in Chinese. Agents read them fine and can reply 
 
 The seed and its companions scatter in the wind. It finally lands in the light it once looked up at and finds it is only a lantern; farther off, its companions are each glowing somewhere of their own.
 
-The score is code too: Tone.js with real instrument samples (harp, violin, cello, flute, clarinet and more), and everything in the picture is timed in musical beats. Picture, score and render scripts are all in `prints-kit/`.
+The score is code too: Tone.js with real instrument samples (string sections, solo violin and French horn from VSCO2 Community Edition, plus harp, flute, clarinet, nylon guitar and more), and everything in the picture is timed in musical beats. Picture, score and render scripts are all in `prints-kit/`.
 
 ![Far Light](docs/yuanguang.webp)
 
@@ -115,7 +115,7 @@ The two songs are copyrighted, so this repository contains no audio or lyrics. A
   - Colored ink-wash fights: a 2D canvas engine written for this repo, `inkfight-kit/`, 20–100 ms per frame.
   - Science explainers: a 2D canvas engine written for this repo, `explainer-kit/`, 60–130 ms per frame, with synthesized sound effects and edge-tts narration.
   - Printmaking series: six print techniques generated as SVG, `prints-kit/`, about 1 s per frame, rendered in parallel.
-- **Writing your own score**: Tone.js with real instrument samples instead of synth tones; three layers, a density curve, a single climax, humanized timing; offline export from headless Chrome with two-pass loudness normalization; picture timed to the beat.
+- **Writing your own score**: Tone.js with real instrument samples (including VSCO2 orchestral samples) instead of synth tones; three layers, a density curve, a single climax, humanized timing; offline export from headless Chrome with two-pass loudness normalization; picture timed to the beat.
 - **Rules of filmmaking**: one thing for the viewer to watch per shot, cause before reaction; give the audience time to understand; a transition at every seam; no text in the picture; rich but not cheap, no confetti or sparks as filler.
 - **A checking loop**: after every shot, render a contact sheet, consecutive frames, and zoomed crops, then look at them with an image viewer. Check for teleporting, floating hands, flipped facing, props covering faces, muddy colors. You cannot tell whether an animation works by reading code.
 - **A full music-video workflow**: beat analysis → a shot list written in beat numbers (change the edit in one place) → cheap style tests → a parts library → batches with self-review → targeted reshoots → color grading with ffmpeg.
