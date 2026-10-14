@@ -8,6 +8,21 @@
 
 ## 用它做的片子
 
+### 《一滴墨》· 流体彩墨 MV
+
+91 秒，一首古典 + 摇滚的曲子，画面是一张纸上的墨和彩墨。开头一滴墨落下，小提琴像一支笔在纸上写；第 16 秒鼓和失真吉他砸进来，颜色从墨里炸开；高潮每一记镲都换一种开花方式；最后颜色褪回纸色，又是一滴墨。
+
+画面是 WebGL 流体模拟，颜料按吸光度叠色。曲子里的每个音符都直接推动颜料：小提琴是笔，底鼓是冲击，镲是开花，和弦决定颜色。配乐也是代码写的：VSCO2 弦乐、DRSKit 多力度真鼓，分轨后过一个自己写的 Python 混音台。画面、乐谱、鼓采样整理脚本和混音台都在 `fluid-kit/`。
+
+![一滴墨](docs/yidimo.webp)
+
+<details>
+<summary>全片一览</summary>
+
+![一滴墨全片](docs/yidimo_sheet.jpg)
+
+</details>
+
 ### 《远光》· 版画系列短片
 
 93 秒，不出现人。一颗蒲公英种子的六段旅程：盛夏、仰望、风起、高处、远光、尾声。每段换一种版画工艺：孔版套印、铜版蚀刻、大理石纹染纸、蓝晒、凸版网点、植物图版。地平线和远处那盏光六段都不动。
@@ -102,18 +117,19 @@
 
 ![拾星](docs/shixing.webp)
 
-两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成；《用光，打开大脑》的声效和旁白分别跑 `explainer-kit/tools/audio.js`、`tools/voice.js` 生成；《远光》的配乐跑 `prints-kit` 里的 `npm run audio` 生成。
+两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成；《用光，打开大脑》的声效和旁白分别跑 `explainer-kit/tools/audio.js`、`tools/voice.js` 生成；《远光》的配乐跑 `prints-kit` 里的 `npm run audio` 生成；《一滴墨》的配乐按 `fluid-kit` 的说明下好鼓采样后，跑 `npm run stems` 和 `npm run mix` 生成。
 
 ## 它教给 agent 什么
 
-- **六套制作引擎**
+- **七套制作引擎**
   - 水彩、水墨、版画：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，速度随镜头复杂度波动较大。
   - 蜡笔绘本：本仓库自写的 2D canvas 引擎 `crayon-kit/`，每帧 10–50ms。
   - 皮影：自写的 2D canvas 引擎 `piying-kit/`，每帧 2–10ms，锣鼓用代码合成。
   - 设色水墨打斗：自写的 2D canvas 引擎 `inkfight-kit/`，每帧 20–100ms。
   - 科普讲解片：自写的 2D canvas 引擎 `explainer-kit/`，每帧 60–130ms，声效代码合成，旁白 edge-tts。
   - 版画系列：SVG 生成的六种版画工艺 `prints-kit/`，每帧约 1 秒，多路并行渲染。
-- **自己写配乐**：Tone.js 加真乐器采样（含 VSCO2 真管弦乐），不用合成音色；三层编曲、密度曲线、全曲只留一个高点、人性化；无头 Chrome 离线导出、两遍响度标准化；画面按拍子对齐。
+  - 流体彩墨：WebGL2 稳定流体 `fluid-kit/`，音符表直接驱动颜料，每帧约 65ms，只能顺序渲染。
+- **自己写配乐**：Tone.js 加真乐器采样（含 VSCO2 真管弦乐），不用合成音色；三层编曲、密度曲线、全曲只留一个高点、人性化；无头 Chrome 离线导出、两遍响度标准化；画面按拍子对齐。古典 + 摇滚的曲子另有多力度轮换的真鼓、分轨导出和一个自写的混音台（均衡、压缩、饱和、卷积混响、按段对齐响度、限幅）。
 - **导演手册**：景别、轴线和 30 度规则、剪辑点、「停、爆、停」的节奏、构图和视线、角色表演、动作戏原则，最后是一张分镜检查表。写给只会照指令做的模型也能用。
 - **做片子的规矩**：每个镜头只让观众看一件事、先有原因再有反应；给「看懂」留时间；每个接缝都有转场；画面不写字；丰富但不廉价，不撒火花填空。
 - **检查循环**：每做完一个镜头就渲出联系表、连续帧、局部放大图，用读图工具自己看，查瞬移、悬空的手、朝向、道具挡脸、颜色发脏。只读代码看不出动画好不好。
@@ -126,12 +142,13 @@
 
 | 路径 | 内容 |
 |---|---|
-| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用），`explainer.md` 科普讲解片，`prints.md` 版画系列，`music.md` 自己写配乐 |
+| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用），`explainer.md` 科普讲解片，`prints.md` 版画系列，`fluid.md` 流体彩墨 MV，`music.md` 自己写配乐 |
 | `crayon-kit/` | 蜡笔引擎、角色（3 头身小人和呆头鸟）、零件库、16 秒 demo、歌词字幕工具 |
 | `piying-kit/` | 皮影引擎、带操纵杆的关节小人、60 秒短片《两只手》全部代码和分镜、锣鼓合成器 |
 | `inkfight-kit/` | 设色水墨引擎、勾线平涂的人体骨架、19.5 秒打斗短片《试拳》全部代码、算关节坐标的 `probe.mjs`、24 招的招式库 `moves.js`（`plan()` 按接触时刻拼招，附一段示范对打） |
 | `explainer-kit/` | 科普片引擎、3 分钟科普片《用光，打开大脑》全部代码、声效合成器 `tools/audio.js`、旁白脚本 `tools/voice.js` |
 | `prints-kit/` | 六种版画工艺的 SVG 生成、93 秒短片《远光》全部代码、配乐乐谱与离线导出、并行渲染脚本 |
+| `fluid-kit/` | WebGL 流体引擎、91 秒 MV《一滴墨》全部画面代码和音符表、乐谱、DRSKit 真鼓整理脚本和播放器、混音台 `mixdesk.py` 及配置 |
 | `examples/brush/` | 《拾星》《落款》的场景代码，放进 ClaudeAnimationBase 就能跑 |
 | `tools/` | `analyze.py` 节拍与段落分析，`make_shotlist.py` 拍号逐镜表模板 |
 | `docs/` | README 用的预览图 |
@@ -153,6 +170,7 @@ cd paint-video-skill
 - 皮影锣鼓合成：Python 3、numpy、scipy
 - 科普片旁白：Python 3、`pip install edge-tts`（要能连上微软语音服务，必要时设 `TTS_PROXY`）
 - 节拍分析：再加 scipy、matplotlib
+- 流体彩墨的配乐：Python 3、numpy、scipy；鼓采样要自己下 [DRSKit 2.1](https://drumgizmo.org/wiki/doku.php?id=kits:drskit)（约 2.6 GB），解压后跑 `python -I tools/drs_build.py <解压目录> samples/drs`。只看画面不用下
 - 水彩画风：另外 clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) 并 `npm install`
 
 ## 先跑一下蜡笔 demo
@@ -189,6 +207,7 @@ RTX 4060 笔记本上实测：
 | 设色打斗引擎 | 20–100ms | 19.5 秒 468 帧，4 进程不到 1 分钟 |
 | 科普片引擎 | 60–130ms | 3:05 共 5550 帧，单进程直出 MP4 约 9 分钟 |
 | p5.brush 水彩 | 约 1 秒起，复杂镜头更慢 | 2:09 的 MV 共 3102 帧，3 进程实测约 1.5–2 小时 |
+| 流体彩墨 | 约 65ms | 91 秒 2730 帧，单进程顺序渲染约 3 分钟 |
 | 字幕层 | — | 整片 6 进程加合成约 3–8 分钟 |
 
 ## 致谢
@@ -196,6 +215,8 @@ RTX 4060 笔记本上实测：
 - [PDoomVideo](https://github.com/JohnHeibel/PDoomVideo)：Claude 在 Claude Code 里生成的两分半 MV，这套路线的起点（该仓库无许可证，本仓库没有使用它的代码）。
 - [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)（MIT）：p5.brush 底座，`crayon-kit/`、`piying-kit/`、`inkfight-kit/` 的 `render.mjs` 由它改来。
 - [paint-mv-skills](https://github.com/lintsinghua/paint-mv-skills)（MIT）：歌词对时和音频分析的参考。
+- [DRSKit](https://drumgizmo.org/wiki/doku.php?id=kits:drskit)（CC BY 4.0，DrumGizmo 团队）：《一滴墨》的鼓。
+- [VSCO 2 Community Edition](https://github.com/sgossner/VSCO-2-CE)（CC0）和 [tonejs-instruments](https://github.com/nbrosowsky/tonejs-instruments)：管弦乐和吉他、贝斯采样。
 - 字体推荐 [马善政楷书](https://fonts.google.com/specimen/Ma+Shan+Zheng)、[龙藏体](https://fonts.google.com/specimen/Long+Cang)、[志莽行书](https://fonts.google.com/specimen/Zhi+Mang+Xing)，都是 OFL，需自行下载。
 
 ## 许可

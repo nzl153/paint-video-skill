@@ -1,0 +1,18 @@
+{
+  "name": "fluid-kit",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Music-driven ink and pigment fluid MV: WebGL2 stable fluids driven by the note list of a Tone.js score, real multi-velocity drums, and a numpy mixing desk",
+  "scripts": {
+    "events": "node tools/audio.mjs --events",
+    "stems": "node tools/audio.mjs --stems",
+    "mix": "python -I tools/mixdesk.py music/mix.py",
+    "check": "node tools/render.mjs --at=16.5,48.5,56.5,79.7",
+    "video": "node tools/render.mjs --audio=out/yidimo_mix.wav"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.11.0"
+  }
+}
