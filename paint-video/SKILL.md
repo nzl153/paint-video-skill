@@ -1,13 +1,13 @@
 ---
 name: paint-video
-description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎，皮影用自写的皮影引擎，打斗用自写的设色水墨引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md，皮影看 piying.md，打斗和雾山五行风看 wushan.md，科普讲解片（原理科普、HTML 演示 + 代码合成声效 + edge-tts 配音，允许字幕和标注）看 explainer.md。版画系列（孔版、铜版、大理石纹、蓝晒、网点、植物图版，SVG 生成，每段一种工艺）看 prints.md；音符驱动的流体彩墨 MV（WebGL 流体、抽象、不画人）看 fluid.md；要自己写配乐（Tone.js + 真乐器采样含 VSCO2 管弦乐和真鼓，离线导出，分轨加自写混音台，按拍对画面）看 music.md。
+description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎，皮影用自写的皮影引擎，打斗用自写的设色水墨引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md，皮影看 piying.md，打斗和雾山五行风看 wushan.md，科普讲解片（原理科普、HTML 演示 + 代码合成声效 + edge-tts 配音，允许字幕和标注）看 explainer.md。版画系列（孔版、铜版、大理石纹、蓝晒、网点、植物图版，SVG 生成，每段一种工艺）看 prints.md；音符驱动的流体彩墨 MV（WebGL 流体、抽象、不画人）看 fluid.md；沙画（灯箱上的沙底下透光、一幅抹成下一幅，WebGL 高度场）看 sand.md；要自己写配乐（Tone.js + 真乐器采样含 VSCO2 管弦乐和真鼓，离线导出，分轨加自写混音台，按拍对画面）看 music.md。
 ---
 
 # 手绘动画短片
 
 整条路线：每一帧都是一个 **t（秒）的纯函数**，用笔刷画出来（墨线、平涂、水彩晕染、排线）。无头 Chrome 并行把帧渲染成图片，ffmpeg 再合成 MP4。画面里没有一张图是 AI 生图，全部是代码画的。
 
-六套引擎：
+八套引擎：
 
 | 画风 | 引擎 | 从哪起步 |
 |---|---|---|
@@ -17,12 +17,14 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 | 设色水墨打斗（雾山五行风） | 纯 2D canvas，每帧 20–100ms | 本仓库的 `inkfight-kit/`，见 `wushan.md` |
 | 科普讲解片（图示、字幕、配音） | 纯 2D canvas，每帧 60–130ms，声效代码合成，旁白 edge-tts | 本仓库的 `explainer-kit/`，见 `explainer.md` |
 | 版画系列（孔版、铜版、蓝晒、网点等） | SVG，每帧约 1 秒，多路并行渲染；配乐用 Tone.js 加真乐器采样 | 本仓库的 `prints-kit/`，见 `prints.md`、`music.md` |
+| 流体彩墨（音符驱动、抽象） | WebGL2 稳定流体，每帧约 65ms，只能顺序渲染 | 本仓库的 `fluid-kit/`，见 `fluid.md` |
+| 沙画（灯箱透光、一幅抹成下一幅） | WebGL2 高度场，每帧约 90ms 起，只能顺序渲染 | 本仓库的 `sand-kit/`，见 `sand.md` |
 
 参照作品：[PDoomVideo](https://github.com/JohnHeibel/PDoomVideo)，一支两分半的 MV，由 Claude 在 Claude Code 里生成。那个仓库没有许可证，只能学，不能拿代码去发布；ClaudeAnimationBase 是同一作者后来整理出的 MIT 底座。
 
 ## 环境
 
-- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`inkfight-kit/`、`fluid-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
+- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`inkfight-kit/`、`fluid-kit/`、`sand-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
 - Node 22.12 以上，Chrome 或 Chromium（找不到时给 `render.mjs` 传 `--chrome=<路径>`，或设 `CHROME_PATH`），ffmpeg 在 PATH 里。
 - 字幕工具要 Python 3 和 numpy、Pillow。
 - `npm install` 会下载并执行第三方代码，装之前先问用户。开新项目时把已经装好的模板目录连 `node_modules` 一起复制，就不用每次重装。
@@ -160,6 +162,10 @@ Clawd 捧着空罐子接住掉下来的星星，一罐星光把夜色一点点�
 ## 第七套：流体彩墨 MV（音符驱动）
 
 想要画面一直在动、不讲具体故事、跟着音乐一下一下变的 MV 时，**读同目录的 `fluid.md`**。底座是 `fluid-kit/`（《一滴墨》，91 秒，古典 + 摇滚）。WebGL2 稳定流体，颜料按吸光度叠色；乐谱导出音符表，每种乐器有固定画法（小提琴是笔、底鼓是冲击、镲是开花），每一段是一种「水性」；高潮的开花有 7 种炸法轮换。不画人，没有镜头，帧只能顺序渲染。
+
+## 第八套：沙画（灯箱透光，一幅抹成下一幅）
+
+要讲一个小故事、但不想画人，画面又要一直在变、不像动态 PPT 时，**读同目录的 `sand.md`**。底座是 `sand-kit/`（《沙漏》，75 秒，一粒沙看见的一年，九幅首尾相接）。WebGL 高度场模拟沙子：撒、指尖划、手掌推、休止角、沙帘、按平、抹亮三角、开月亮；底光按三个通道分别透射，薄处一粒一粒。规矩是光是主角、转场靠形状接上、留白。画面先定，配乐后写，60 拍每分钟，一拍等于一秒。帧只能顺序渲染。
 
 ## 自己写配乐
 
