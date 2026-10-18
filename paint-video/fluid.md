@@ -12,7 +12,7 @@
 
 ## 管线
 
-1. 乐谱里每个音符都记一笔：`[乐器, 音名, 秒, 时值, 力度]` 推进 `window.EV`。`node tools/audio.mjs --events` 导出成 `src/events.json`。**改了乐谱就要重导**，画面才跟得上。
+1. 乐谱里每个音符都记一笔：`[乐器, 音名, 秒, 时值, 力度]` 推进 `window.EV`。`node tools/audio.mjs --events` 导出成 `src/events.json`。**改了乐谱就要重导**，画面才跟得上。导出要初始化整首乐曲，鼓采样（DRSKit）没装好会失败；仓库自带的 `events.json` 只看画面够用。
 2. `src/mv.js` 读音符表，按乐器和时间排成一张事件表：哪一秒、在哪、加什么颜料、给多大的力。
 3. 流体逐帧推进，每帧拍一张 JPEG，ffmpeg 合上混好的音轨。
 

@@ -137,7 +137,7 @@
 ## 它教给 agent 什么
 
 - **八套制作引擎**
-  - 水彩、水墨、版画：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，速度随镜头复杂度波动较大。
+  - 水彩、水墨：p5.js + p5.brush，基于 [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)，速度随镜头复杂度波动较大。
   - 蜡笔绘本：本仓库自写的 2D canvas 引擎 `crayon-kit/`，每帧 10–50ms。
   - 皮影：自写的 2D canvas 引擎 `piying-kit/`，每帧 2–10ms，锣鼓用代码合成。
   - 设色水墨打斗：自写的 2D canvas 引擎 `inkfight-kit/`，每帧 20–100ms。
@@ -187,7 +187,8 @@ cd paint-video-skill
 - 皮影锣鼓合成：Python 3、numpy、scipy
 - 科普片旁白：Python 3、`pip install edge-tts`（要能连上微软语音服务，必要时设 `TTS_PROXY`）
 - 节拍分析：再加 scipy、matplotlib
-- 流体彩墨的配乐：Python 3、numpy、scipy；鼓采样要自己下 [DRSKit 2.1](https://drumgizmo.org/wiki/doku.php?id=kits:drskit)（约 2.6 GB），解压后跑 `python -I tools/drs_build.py <解压目录> samples/drs`。只看画面不用下
+- 流体彩墨的配乐：Python 3、numpy、scipy；鼓采样要自己下 [DRSKit 2.1](https://drumgizmo.org/wiki/doku.php?id=kits:drskit)（约 2.6 GB），解压后跑 `python -I tools/drs_build.py <解压目录> samples/drs`。只看画面不用下；改了乐谱要重导音符表（`npm run events`）时也得先装好鼓包
+- 版画、流体、沙画的配乐第一次导出时要联网，从 jsDelivr 下载 Tone.js 和乐器采样（版画、沙画各约 200MB），之后从各自的 `.cache/` 读
 - 水彩画风：另外 clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) 并 `npm install`
 
 ## 先跑一下蜡笔 demo
@@ -225,7 +226,7 @@ RTX 4060 笔记本上实测：
 | 科普片引擎 | 60–130ms | 3:05 共 5550 帧，单进程直出 MP4 约 9 分钟 |
 | p5.brush 水彩 | 约 1 秒起，复杂镜头更慢 | 2:09 的 MV 共 3102 帧，3 进程实测约 1.5–2 小时 |
 | 流体彩墨 | 约 65ms | 91 秒 2730 帧，单进程顺序渲染约 3 分钟 |
-| 沙画 | 约 90ms，长树那段几百毫秒 | 78 秒 2340 帧，单进程顺序渲染约 25 分钟 |
+| 沙画 | 约 90ms，长树那段几百毫秒 | 75 秒正片加 3 秒余音共 78 秒，2340 帧，单进程顺序渲染约 25 分钟 |
 | 字幕层 | — | 整片 6 进程加合成约 3–8 分钟 |
 
 ## 致谢

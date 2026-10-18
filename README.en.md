@@ -139,7 +139,7 @@ The two songs are copyrighted, so this repository contains no audio or lyrics. A
 ## What it teaches the agent
 
 - **Eight rendering engines**
-  - Watercolor, ink wash, printmaking: p5.js + p5.brush, built on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase); speed varies widely with scene complexity.
+  - Watercolor, ink wash: p5.js + p5.brush, built on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase); speed varies widely with scene complexity.
   - Crayon picture book: a 2D canvas engine written for this repo, `crayon-kit/`, 10–50 ms per frame.
   - Shadow puppets: a 2D canvas engine written for this repo, `piying-kit/`, 2–10 ms per frame, with synthesized percussion.
   - Colored ink-wash fights: a 2D canvas engine written for this repo, `inkfight-kit/`, 20–100 ms per frame.
@@ -189,7 +189,8 @@ Requirements:
 - Shadow puppet percussion: Python 3, numpy, scipy
 - Explainer narration: Python 3 and `pip install edge-tts` (needs access to Microsoft's speech service; set `TTS_PROXY` if you need a proxy)
 - Beat analysis: also scipy, matplotlib
-- Fluid ink score: Python 3, numpy, scipy; download the drums yourself from [DRSKit 2.1](https://drumgizmo.org/wiki/doku.php?id=kits:drskit) (about 2.6 GB), unpack, and run `python -I tools/drs_build.py <unpacked dir> samples/drs`. Not needed for the picture alone
+- Fluid ink score: Python 3, numpy, scipy; download the drums yourself from [DRSKit 2.1](https://drumgizmo.org/wiki/doku.php?id=kits:drskit) (about 2.6 GB), unpack, and run `python -I tools/drs_build.py <unpacked dir> samples/drs`. Not needed for the picture alone, but re-exporting the note list after editing the score (`npm run events`) needs the drums installed too
+- The scores of the prints, fluid and sand films need a network connection on the first export to download Tone.js and instrument samples from jsDelivr (about 200 MB each for prints and sand), then read them from each kit's `.cache/`
 - Watercolor style: also clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) and run `npm install`
 
 ## Try the crayon demo
@@ -227,7 +228,7 @@ Measured on an RTX 4060 laptop:
 | Explainer engine | 60–130 ms | 3:05, 5550 frames, about 9 minutes straight to MP4 with one worker |
 | p5.brush watercolor | about 1 s and up; complex shots are slower | 2:09 MV, 3102 frames, measured at about 1.5–2 hours with 3 workers |
 | Fluid ink | about 65 ms | 91 s, 2730 frames, about 3 minutes rendered sequentially in one process |
-| Sand animation | about 90 ms; a few hundred ms while the tree grows | 78 s, 2340 frames, about 25 minutes rendered sequentially in one process |
+| Sand animation | about 90 ms; a few hundred ms while the tree grows | 75 s of film plus 3 s of tail, 78 s and 2340 frames in all, about 25 minutes rendered sequentially in one process |
 | Subtitle layer | — | whole film including compositing, about 3–8 minutes with 6 workers |
 
 ## Acknowledgements

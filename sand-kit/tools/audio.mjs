@@ -1,5 +1,5 @@
 // 渲配乐：node tools/audio.mjs → out/shalou.wav、out/shalou.mp3
-// 无头 Chrome 没有声卡，只能 Tone.Offline 离线渲。采样约 150MB，从 jsDelivr 拉一次后存在 .cache/，以后从本地读
+// 无头 Chrome 没有声卡，只能 Tone.Offline 离线渲。采样约 200MB，从 jsDelivr 拉一次后存在 .cache/，以后从本地读
 import { writeFileSync, unlinkSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';

@@ -5,13 +5,13 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 
 # 手绘动画短片
 
-整条路线：每一帧都是一个 **t（秒）的纯函数**，用笔刷画出来（墨线、平涂、水彩晕染、排线）。无头 Chrome 并行把帧渲染成图片，ffmpeg 再合成 MP4。画面里没有一张图是 AI 生图，全部是代码画的。
+整条路线：每一帧都是一个 **t（秒）的纯函数**，用笔刷画出来（墨线、平涂、水彩晕染、排线）。无头 Chrome 并行把帧渲染成图片，ffmpeg 再合成 MP4。例外是流体和沙画：画面有跨帧的模拟状态，只能从头顺序渲染。画面里没有一张图是 AI 生图，全部是代码画的。
 
 八套引擎：
 
 | 画风 | 引擎 | 从哪起步 |
 |---|---|---|
-| 水彩、水墨、版画 | p5.js + p5.brush，速度随镜头复杂度波动较大 | [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)（MIT） |
+| 水彩、水墨（排线可做局部版画感） | p5.js + p5.brush，速度随镜头复杂度波动较大 | [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)（MIT） |
 | 蜡笔、绘本、连环画 | 纯 2D canvas，每帧 10–50ms | 本仓库的 `crayon-kit/`，见 `crayon.md` |
 | 皮影、剪影、戏台 | 纯 2D canvas，每帧 2–10ms，锣鼓用代码合成 | 本仓库的 `piying-kit/`，见 `piying.md` |
 | 设色水墨打斗（雾山五行风） | 纯 2D canvas，每帧 20–100ms | 本仓库的 `inkfight-kit/`，见 `wushan.md` |
@@ -24,7 +24,7 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 
 ## 环境
 
-- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`inkfight-kit/`、`fluid-kit/`、`sand-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
+- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`inkfight-kit/`、`explainer-kit/`、`prints-kit/`、`fluid-kit/`、`sand-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
 - Node 22.12 以上，Chrome 或 Chromium（找不到时给 `render.mjs` 传 `--chrome=<路径>`，或设 `CHROME_PATH`），ffmpeg 在 PATH 里。
 - 字幕工具要 Python 3 和 numpy、Pillow。
 - `npm install` 会下载并执行第三方代码，装之前先问用户。开新项目时把已经装好的模板目录连 `node_modules` 一起复制，就不用每次重装。
@@ -38,7 +38,7 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 5. 一个镜头一个镜头地做，每做完一个就用下面的检查循环看一遍。
 6. 出片：`node render.mjs --clip --out=out/video.mp4`。时长较长的用 `--frames --workers=4` 并行渲染，再 `--encode` 合成。
 
-本仓库 `examples/brush/` 有两支完整可跑的场景：`stars.js`（《拾星》，14.5 秒，bpm 90）和 `ink.js`（《落款》，水墨，16.8 秒，bpm 80）。放进 `src/scenes/`，在 `studio.html` 里替换 `demo.js`，再把 `config.js` 的时长和 bpm 改成文件头写的值。只参考写法，别照抄故事。
+本仓库 `examples/brush/` 有两支完整可跑的场景：`stars.js`（《拾星》，14.5 秒，bpm 90）和 `ink.js`（《落款》，水墨，16.8 秒，bpm 80）。放进 `src/scenes/`，在 `studio.html` 里替换 `demo.js`，再把 `config.js` 的时长和 bpm 改成上面括号里的值。只参考写法，别照抄故事。
 
 **给底座打的两个补丁**（`render.mjs` 里两处 ffmpeg 参数和一处 Chrome 参数）：
 - 输出改成标准 tv range：把 `'-pix_fmt', 'yuv420p'` 换成 `'-vf', 'scale=out_range=tv,format=yuv420p', '-color_range', 'tv'`。否则有的播放器会放成全黑。
