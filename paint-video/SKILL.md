@@ -1,6 +1,6 @@
 ---
 name: paint-video
-description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎，皮影用自写的皮影引擎，打斗用自写的设色水墨引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md，皮影看 piying.md，打斗和雾山五行风看 wushan.md，科普讲解片（原理科普、HTML 演示 + 代码合成声效 + edge-tts 配音，允许字幕和标注）看 explainer.md。版画系列（孔版、铜版、大理石纹、蓝晒、网点、植物图版，SVG 生成，每段一种工艺）看 prints.md；音符驱动的流体彩墨 MV（WebGL 流体、抽象、不画人）看 fluid.md；沙画（灯箱上的沙底下透光、一幅抹成下一幅，WebGL 高度场）看 sand.md；作业本涂鸦（圆珠笔勾线 + 彩铅排线 + 手机俯拍的作业本，涂鸦小东西活过来，带实物笔和影子）看 doodle.md；要自己写配乐（Tone.js + 真乐器采样含 VSCO2 管弦乐和真鼓，离线导出，分轨加自写混音台，按拍对画面）看 music.md。
+description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js + p5.brush，蜡笔绘本用自写的 2D canvas 蜡笔引擎，皮影用自写的皮影引擎，打斗用自写的设色水墨引擎；逐帧画，无头 Chrome 渲染，ffmpeg 合成 MP4。用户说「做个短片 / 动画 / MV / 开场动画 / 十几秒的视频」时用这份；配整首歌的长片或 MV 另看同目录的 mv-workflow.md，蜡笔画风看 crayon.md，皮影看 piying.md，打斗和雾山五行风看 wushan.md，科普讲解片（原理科普、HTML 演示 + 代码合成声效 + edge-tts 配音，允许字幕和标注）看 explainer.md。版画系列（孔版、铜版、大理石纹、蓝晒、网点、植物图版，SVG 生成，每段一种工艺）看 prints.md；音符驱动的流体彩墨 MV（WebGL 流体、抽象、不画人）看 fluid.md；沙画（灯箱上的沙底下透光、一幅抹成下一幅，WebGL 高度场）看 sand.md；作业本涂鸦（圆珠笔勾线 + 彩铅排线 + 手机俯拍的作业本，涂鸦小东西活过来，带实物笔和影子）看 doodle.md；共点蒙太奇（同一个形状始终落在画面同一点，快切或画风接力）看 montage.md；要自己写配乐（Tone.js + 真乐器采样含 VSCO2 管弦乐和真鼓，离线导出，分轨加自写混音台，按拍对画面）看 music.md。
 ---
 
 # 手绘动画短片
@@ -20,12 +20,13 @@ description: 用代码做手绘风格的动画短片：水彩、水墨用 p5.js 
 | 流体彩墨（音符驱动、抽象） | WebGL2 稳定流体，每帧约 65ms，只能顺序渲染 | 本仓库的 `fluid-kit/`，见 `fluid.md` |
 | 沙画（灯箱透光、一幅抹成下一幅） | WebGL2 高度场，每帧约 90ms 起，只能顺序渲染 | 本仓库的 `sand-kit/`，见 `sand.md` |
 | 作业本涂鸦（圆珠笔、彩铅、拍照纸） | 纯 2D canvas，整页预渲成贴图，每帧 2–10ms | 本仓库的 `doodle-kit/`，见 `doodle.md` |
+| 共点蒙太奇（画风接力） | Node + @napi-rs/canvas 直接出帧，不开浏览器 | 本仓库的 `montage-kit/`，见 `montage.md` |
 
 参照作品：[PDoomVideo](https://github.com/JohnHeibel/PDoomVideo)，一支两分半的 MV，由 Claude 在 Claude Code 里生成。那个仓库没有许可证，只能学，不能拿代码去发布；ClaudeAnimationBase 是同一作者后来整理出的 MIT 底座。
 
 ## 环境
 
-- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`inkfight-kit/`、`explainer-kit/`、`prints-kit/`、`fluid-kit/`、`sand-kit/`、`doodle-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
+- 这份 skill 来自 [paint-video-skill](https://github.com/nzl153/paint-video-skill) 仓库。文中的 `crayon-kit/`、`piying-kit/`、`inkfight-kit/`、`explainer-kit/`、`prints-kit/`、`fluid-kit/`、`sand-kit/`、`doodle-kit/`、`montage-kit/`、`examples/`、`tools/` 都在那个仓库里，不在 skill 目录下；本机找不到就问用户仓库 clone 在哪，或者重新 clone 一份。
 - Node 22.12 以上，Chrome 或 Chromium（找不到时给 `render.mjs` 传 `--chrome=<路径>`，或设 `CHROME_PATH`），ffmpeg 在 PATH 里。
 - 字幕工具要 Python 3 和 numpy、Pillow。
 - `npm install` 会下载并执行第三方代码，装之前先问用户。开新项目时把已经装好的模板目录连 `node_modules` 一起复制，就不用每次重装。
@@ -171,6 +172,10 @@ Clawd 捧着空罐子接住掉下来的星星，一罐星光把夜色一点点�
 ## 第九套：作业本涂鸦（圆珠笔 + 彩铅 + 拍照纸）
 
 要「纸」「本子」「上课乱画」的感觉、主角是一只活过来的涂鸦小东西时，**读同目录的 `doodle.md`**。底座是 `doodle-kit/`（《页边》，38 秒，页边的小团子趁笔不在溜了一圈）。圆珠笔线会断墨、彩铅是斜排线加纸齿颗粒、整页带拍照光；一支带影子的实物笔立住照片感。活着的东西线条在抖，定住就回到纸上。一镜到底，配乐跟着动作写。后半份还记了用这套画风拍整首歌剧情 MV 的经验：不画人、用两支笔和滑动的本子演两个人。
+
+## 第十套：共点蒙太奇（同一个形状落在同一点）
+
+很多不相干的画面快切、最后急刹，每一刀都让同一个形状落在画面同一点时，**读同目录的 `montage.md`**。底座是 `montage-kit/`（《一口》，25.8 秒）：甜甜圈铺满画面，孔里牛仔骑马狂奔，每一拍孔里换一种画风、外圈晚一拍接过来，24 种画风接力，最后咬一口。连续动画靠一套解剖级的共用骨架，每种画风只管怎么画。另一种打法「一刀一个世界」也写在里面。
 
 ## 自己写配乐
 

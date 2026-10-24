@@ -1,0 +1,17 @@
+{
+  "name": "montage-kit",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Co-point montage: a ring that fills the frame and a hole with one continuous animation, 24 drawing styles relayed from the hole to the ring one beat late, a hand-built galloping horse rig, and a Tone.js western score",
+  "scripts": {
+    "sheet": "node engine/render.mjs --sheet=1,4,7,10,12,14,15.5,17,19,21,23,25 --cols=4 --out=out/check/sheet.jpg",
+    "audio": "node tools/audio.mjs && python -I music/sfx.py",
+    "video": "node engine/render.mjs --video --audio=out/mix.wav --out=out/yikou.mp4"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.13",
+    "puppeteer-core": "^25.11.0"
+  }
+}

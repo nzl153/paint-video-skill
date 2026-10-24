@@ -8,6 +8,21 @@
 
 ## 用它做的片子
 
+### 《一口》· 共点蒙太奇
+
+25.8 秒。一只甜甜圈几乎铺满画面，孔里一个牛仔骑着马一路狂奔。每一拍孔里换一种画风，外圈晚一拍接过孔里刚用过的那种：素描、水墨、木刻、波普、油画、像素、彩色玻璃、洞穴壁画、蓝图、浮世绘、刺绣、水彩、X 光、剪纸、示波器、马赛克、热成像、蜡笔、青花瓷、橡皮管动画、点彩、黏土，24 种画风一路接力，外圈的东西也跟着变成胶带、圆相、眼睛、玫瑰窗。中途在迈布里奇那张奔马老照片上急刹，最后回到甜甜圈，镜头拉远，被咬了一口。
+
+马和人是一套解剖级的共用骨架，照迈布里奇的奔马关键帧动，每种画风只管怎么画，所以动作跨画风一刀都不断。用 Node 加 @napi-rs/canvas 直接出帧，不开浏览器。配乐也是代码写的：西部奔马，弦乐跳弓、圆号、DRSKit 真鼓，一步画风一拍。画面、配乐和音效都在 `montage-kit/`。
+
+![一口](docs/yikou.webp)
+
+<details>
+<summary>全片一览</summary>
+
+![一口全片](docs/yikou_sheet.jpg)
+
+</details>
+
 ### 《页边》· 作业本涂鸦
 
 38 秒，一镜到底。作业本页边上，一支蓝圆珠笔刚画好一只头顶嫩芽的小团子，笔一抬走它就活了：眨眨眼，走出原位，翻过红色页边线，踩着横线蹦进正文，钻进一团涂掉的错字又甩着一身墨点出来；红笔来了把它圈住，它拽着线头把红圈一点点拆开；听见蓝笔回来，它顺着自己的脚印狂奔回去，扑进原位的压痕里一动不动。镜头最后拉远到整页，脚印、墨点、拆开的红圈全都还在。
@@ -147,7 +162,7 @@
 
 ![拾星](docs/shixing.webp)
 
-两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成；《用光，打开大脑》的声效和旁白分别跑 `explainer-kit/tools/audio.js`、`tools/voice.js` 生成；《远光》的配乐跑 `prints-kit` 里的 `npm run audio` 生成；《一滴墨》的配乐按 `fluid-kit` 的说明下好鼓采样后，跑 `npm run stems` 和 `npm run mix` 生成；《沙漏》《页边》的配乐分别跑 `sand-kit`、`doodle-kit` 里的 `npm run audio` 生成。
+两部 MV 的歌有版权，仓库里不带音频和歌词。上面的预览都是无声画面；《两只手》的锣鼓是合成的，跑一下 `piying-kit/sound/synth.py` 就能生成；《用光，打开大脑》的声效和旁白分别跑 `explainer-kit/tools/audio.js`、`tools/voice.js` 生成；《远光》的配乐跑 `prints-kit` 里的 `npm run audio` 生成；《一滴墨》的配乐按 `fluid-kit` 的说明下好鼓采样后，跑 `npm run stems` 和 `npm run mix` 生成；《沙漏》《页边》的配乐分别跑 `sand-kit`、`doodle-kit` 里的 `npm run audio` 生成；《一口》的配乐按 `fluid-kit` 的办法装好鼓采样后，跑 `montage-kit` 里的 `npm run audio` 生成。
 
 ## 它教给 agent 什么
 
@@ -161,6 +176,7 @@
   - 流体彩墨：WebGL2 稳定流体 `fluid-kit/`，音符表直接驱动颜料，每帧约 65ms，只能顺序渲染。
   - 沙画：WebGL2 沙子高度场 `sand-kit/`，撒、划、推、休止角、沙帘，底光透沙，每帧约 90ms 起，只能顺序渲染。
   - 作业本涂鸦：自写的 2D canvas 引擎 `doodle-kit/`，圆珠笔、彩铅排线、假手写和带影子的实物笔，整页预渲成贴图，每帧 2–10ms。
+  - 共点蒙太奇：`montage-kit/`，两层画风错拍接力，24 种画风共用一套骨架，Node + @napi-rs/canvas 直接出帧。
 - **自己写配乐**：Tone.js 加真乐器采样（含 VSCO2 真管弦乐），不用合成音色；三层编曲、密度曲线、全曲只留一个高点、人性化；无头 Chrome 离线导出、两遍响度标准化；画面按拍子对齐。古典 + 摇滚的曲子另有多力度轮换的真鼓、分轨导出和一个自写的混音台（均衡、压缩、饱和、卷积混响、按段对齐响度、限幅）。
 - **导演手册**：景别、轴线和 30 度规则、剪辑点、「停、爆、停」的节奏、构图和视线、角色表演、动作戏原则，最后是一张分镜检查表。写给只会照指令做的模型也能用。
 - **做片子的规矩**：每个镜头只让观众看一件事、先有原因再有反应；给「看懂」留时间；每个接缝都有转场；画面不写字；丰富但不廉价，不撒火花填空。
@@ -174,7 +190,7 @@
 
 | 路径 | 内容 |
 |---|---|
-| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用），`explainer.md` 科普讲解片，`prints.md` 版画系列，`fluid.md` 流体彩墨 MV，`sand.md` 沙画，`doodle.md` 作业本涂鸦，`music.md` 自己写配乐 |
+| `paint-video/` | skill 本体。`SKILL.md` 短片入门，`mv-workflow.md` 长片与 MV 流程，`crayon.md` 蜡笔画风，`piying.md` 皮影，`wushan.md` 设色打斗，`directing.md` 导演手册（分镜、景别、轴线、剪辑、节奏、表演，各画风通用），`explainer.md` 科普讲解片，`prints.md` 版画系列，`fluid.md` 流体彩墨 MV，`sand.md` 沙画，`doodle.md` 作业本涂鸦，`montage.md` 共点蒙太奇，`music.md` 自己写配乐 |
 | `crayon-kit/` | 蜡笔引擎、角色（3 头身小人和呆头鸟）、零件库、16 秒 demo、歌词字幕工具 |
 | `piying-kit/` | 皮影引擎、带操纵杆的关节小人、60 秒短片《两只手》全部代码和分镜、锣鼓合成器 |
 | `inkfight-kit/` | 设色水墨引擎、勾线平涂的人体骨架、19.5 秒打斗短片《试拳》全部代码、算关节坐标的 `probe.mjs`、24 招的招式库 `moves.js`（`plan()` 按接触时刻拼招，附一段示范对打） |
@@ -183,6 +199,7 @@
 | `fluid-kit/` | WebGL 流体引擎、91 秒 MV《一滴墨》全部画面代码和音符表、乐谱、DRSKit 真鼓整理脚本和播放器、混音台 `mixdesk.py` 及配置 |
 | `sand-kit/` | WebGL 沙画引擎、75 秒短片《沙漏》全部画面代码、照画面写的配乐和离线导出 |
 | `doodle-kit/` | 圆珠笔和彩铅的 2D canvas 引擎、38 秒短片《页边》全部画面代码和分镜、跟着动作写的配乐和离线导出 |
+| `montage-kit/` | 双层画风接力引擎、解剖级奔马骨架、24 种画风、25.8 秒短片《一口》全部代码、配乐和音效 |
 | `examples/brush/` | 《拾星》《落款》的场景代码，放进 ClaudeAnimationBase 就能跑 |
 | `tools/` | `analyze.py` 节拍与段落分析，`make_shotlist.py` 拍号逐镜表模板 |
 | `docs/` | README 用的预览图 |
@@ -205,7 +222,7 @@ cd paint-video-skill
 - 科普片旁白：Python 3、`pip install edge-tts`（要能连上微软语音服务，必要时设 `TTS_PROXY`）
 - 节拍分析：再加 scipy、matplotlib
 - 流体彩墨的配乐：Python 3、numpy、scipy；鼓采样要自己下 [DRSKit 2.1](https://drumgizmo.org/wiki/doku.php?id=kits:drskit)（约 2.6 GB），解压后跑 `python -I tools/drs_build.py <解压目录> samples/drs`。只看画面不用下；改了乐谱要重导音符表（`npm run events`）时也得先装好鼓包
-- 版画、流体、沙画、涂鸦的配乐第一次导出时要联网，从 jsDelivr 下载 Tone.js 和乐器采样（版画、沙画各约 200MB），之后从各自的 `.cache/` 读
+- 版画、流体、沙画、涂鸦、共点蒙太奇的配乐第一次导出时要联网，从 jsDelivr 下载 Tone.js 和乐器采样（版画、沙画各约 200MB），之后从各自的 `.cache/` 读
 - 水彩画风：另外 clone [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) 并 `npm install`
 
 ## 先跑一下蜡笔 demo
@@ -245,6 +262,7 @@ RTX 4060 笔记本上实测：
 | 流体彩墨 | 约 65ms | 91 秒 2730 帧，单进程顺序渲染约 3 分钟 |
 | 沙画 | 约 90ms，长树那段几百毫秒 | 75 秒正片加 3 秒余音共 78 秒，2340 帧，单进程顺序渲染约 25 分钟 |
 | 作业本涂鸦 | 2–10ms（第一帧建整页贴图约 1 秒） | 38 秒 912 帧，4 进程约 40 秒 |
+| 共点蒙太奇 | 约 100ms | 25.8 秒 774 帧，单进程直出 MP4 约 1.5 分钟 |
 | 字幕层 | — | 整片 6 进程加合成约 3–8 分钟 |
 
 ## 致谢
