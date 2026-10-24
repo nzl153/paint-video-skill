@@ -1,0 +1,16 @@
+{
+  "name": "doodle-kit",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Notebook doodle animation: ballpoint lines, colored-pencil hatching and a phone-photo notebook page in pure 2D canvas, plus a Tone.js score written to the action",
+  "scripts": {
+    "sheet": "node render.mjs --sheet=2,6,10,14,18,22,26,31,36 --cols=3 --w=640 --out=out/check/sheet.jpg",
+    "audio": "node tools/audio.mjs",
+    "video": "node render.mjs --frames --workers=4 && node render.mjs --encode --audio=out/yebian.wav --out=out/yebian.mp4"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.11.0"
+  }
+}
